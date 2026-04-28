@@ -3,50 +3,51 @@ import fc from 'fast-check';
 import { MissionAssetV1Schema, MissionPlaintextSchema, parseMissionAsset } from './schema';
 import { canonicalJSON } from './codec';
 
+const validAsset = {
+  schemaVersion: '1',
+  cryptoVersion: '1',
+  lookupVersion: '1',
+  normalizationVersion: '1',
+  missionId: 'ADE-12345-AB1',
+  createdAt: '2026-04-28T10:00:00Z',
+  params: {
+    kdf: 'PBKDF2-HMAC-SHA256',
+    kdfIterations: 600000,
+    kdfHash: 'SHA-256',
+    derivedKeyLength: 32,
+    saltLength: 16,
+    cipher: 'AES-256-GCM',
+    ivLength: 12,
+    gcmTagLength: 16,
+    encoding: 'base64url',
+    signature: 'Ed25519',
+  },
+  wrappedKeys: {
+    'abc123': { salt: 'AAAA', iv: 'BBBB', wrapped: 'CCCC' },
+  },
+  fields: {
+    missionCommander: { iv: 'i', ciphertext: 'c' },
+    communicationChannel: { iv: 'i', ciphertext: 'c' },
+    missionTime: { iv: 'i', ciphertext: 'c' },
+    rallyTime: { iv: 'i', ciphertext: 'c' },
+    rallyLocation: { iv: 'i', ciphertext: 'c' },
+    requiredGear: { iv: 'i', ciphertext: 'c' },
+    accessPermission: { iv: 'i', ciphertext: 'c' },
+    rewardDistribution: { iv: 'i', ciphertext: 'c' },
+    missionBrief: { iv: 'i', ciphertext: 'c' },
+  },
+  heroImage: {
+    iv: 'i', ciphertext: 'c',
+    metadata: { mimeType: 'image/jpeg', byteLength: 100, altText: 'alt' },
+  },
+  signature: {
+    alg: 'Ed25519',
+    publicKeyFingerprint: 'fp',
+    value: 'sig',
+  },
+};
+
 describe('MissionAssetV1 schema', () => {
-  const validAsset = {
-    schemaVersion: '1',
-    cryptoVersion: '1',
-    lookupVersion: '1',
-    normalizationVersion: '1',
-    missionId: 'ADE-12345-AB1',
-    createdAt: '2026-04-28T10:00:00Z',
-    params: {
-      kdf: 'PBKDF2-HMAC-SHA256',
-      kdfIterations: 600000,
-      kdfHash: 'SHA-256',
-      derivedKeyLength: 32,
-      saltLength: 16,
-      cipher: 'AES-256-GCM',
-      ivLength: 12,
-      gcmTagLength: 16,
-      encoding: 'base64url',
-      signature: 'Ed25519',
-    },
-    wrappedKeys: {
-      'abc123': { salt: 'AAAA', iv: 'BBBB', wrapped: 'CCCC' },
-    },
-    fields: {
-      missionCommander: { iv: 'i', ciphertext: 'c' },
-      communicationChannel: { iv: 'i', ciphertext: 'c' },
-      missionTime: { iv: 'i', ciphertext: 'c' },
-      rallyTime: { iv: 'i', ciphertext: 'c' },
-      rallyLocation: { iv: 'i', ciphertext: 'c' },
-      requiredGear: { iv: 'i', ciphertext: 'c' },
-      accessPermission: { iv: 'i', ciphertext: 'c' },
-      rewardDistribution: { iv: 'i', ciphertext: 'c' },
-      missionBrief: { iv: 'i', ciphertext: 'c' },
-    },
-    heroImage: {
-      iv: 'i', ciphertext: 'c',
-      metadata: { mimeType: 'image/jpeg', byteLength: 100, altText: 'alt' },
-    },
-    signature: {
-      alg: 'Ed25519',
-      publicKeyFingerprint: 'fp',
-      value: 'sig',
-    },
-  };
 
   it('parses valid asset', () => {
     expect(() => MissionAssetV1Schema.parse(validAsset)).not.toThrow();
@@ -102,43 +103,23 @@ describe('MissionAssetV1 schema (fuzz)', () => {
     );
   });
 
-  it('rejects assets with unknown extra top-level fields', () => {
-    // Note: zod by default strips unknown keys, but doesn't fail.
-    // Use .strict() in schema if we need to reject unknown.
-    // For v1, we tolerate extra fields (fail-open) — assert this behavior is intentional.
-    const ok = parseMissionAsset({ schemaVersion: '1', extraJunk: true });
-    expect(ok.ok).toBe(false);  // missing required fields fails first
+  it('strips unknown extra top-level fields (fail-open by design)', () => {
+    // zod's default object behavior is to silently strip unknown keys.
+    // For v1 we accept this fail-open posture; the spec's threat model relies on
+    // signature + AAD for tamper detection, not on strict schema rejection.
+    // If future hardening requires rejecting unknown fields, add .strict() to the schema.
+    const result = parseMissionAsset({ ...validAsset, extraJunk: true, mystery: 42 });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      // Stripped — extra fields not on the parsed value.
+      expect('extraJunk' in result.value).toBe(false);
+      expect('mystery' in result.value).toBe(false);
+    }
   });
 
   it('rejects mutated valid asset where missionId pattern is broken', () => {
-    const valid = {
-      schemaVersion: '1', cryptoVersion: '1', lookupVersion: '1', normalizationVersion: '1',
-      missionId: 'lowercase-bad-id',
-      createdAt: '2026-04-28T10:00:00Z',
-      params: {
-        kdf: 'PBKDF2-HMAC-SHA256', kdfIterations: 600000, kdfHash: 'SHA-256',
-        derivedKeyLength: 32, saltLength: 16, cipher: 'AES-256-GCM',
-        ivLength: 12, gcmTagLength: 16, encoding: 'base64url', signature: 'Ed25519',
-      },
-      wrappedKeys: {},
-      fields: {
-        missionCommander: { iv: 'i', ciphertext: 'c' },
-        communicationChannel: { iv: 'i', ciphertext: 'c' },
-        missionTime: { iv: 'i', ciphertext: 'c' },
-        rallyTime: { iv: 'i', ciphertext: 'c' },
-        rallyLocation: { iv: 'i', ciphertext: 'c' },
-        requiredGear: { iv: 'i', ciphertext: 'c' },
-        accessPermission: { iv: 'i', ciphertext: 'c' },
-        rewardDistribution: { iv: 'i', ciphertext: 'c' },
-        missionBrief: { iv: 'i', ciphertext: 'c' },
-      },
-      heroImage: {
-        iv: 'i', ciphertext: 'c',
-        metadata: { mimeType: 'image/jpeg', byteLength: 1, altText: '' },
-      },
-      signature: { alg: 'Ed25519', publicKeyFingerprint: 'fp', value: 'sig' },
-    };
-    expect(parseMissionAsset(valid).ok).toBe(false);
+    const broken = { ...validAsset, missionId: 'lowercase-bad-id' };
+    expect(parseMissionAsset(broken).ok).toBe(false);
   });
 
   it('canonical JSON is stable under fc-generated key orderings', () => {
