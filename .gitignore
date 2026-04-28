@@ -6,3 +6,12 @@ playwright-report
 test-results
 .vite
 coverage
+
+# tsc -b incremental build artifacts (emitted from composite tsconfig.node.json)
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
+vitest.config.js
+vitest.config.d.ts
+playwright.config.js
+playwright.config.d.ts
