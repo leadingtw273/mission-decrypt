@@ -45,68 +45,70 @@ export function LockedView({ asset, onSubmit, submitting }: LockedViewProps) {
 
   return (
     <section className="border border-border bg-bg-secondary/60 px-6 py-8 shadow-[0_0_40px_rgba(255,186,0,0.06)] md:px-8">
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(280px,0.9fr)_minmax(0,1.15fr)] lg:items-start">
-        <div className="flex flex-col items-center justify-center gap-5">
-          <FrameBracket
-            size={26}
-            color="primary"
-            className="w-full max-w-[280px] border border-primary/30 bg-bg-primary/70 px-8 py-10"
-          >
-            <LockIcon />
-          </FrameBracket>
-          <div className="font-label flex items-center gap-2 text-sm text-primary">
-            <span>ACCESS LOCKED</span>
-            <span aria-hidden="true" className="inline-block h-4 w-px bg-primary motion-safe:animate-pulse" />
+      <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-col items-center justify-center gap-5">
+            <FrameBracket
+              size={26}
+              color="primary"
+              className="w-full max-w-[280px] border border-primary/30 bg-bg-primary/70 px-8 py-10"
+            >
+              <LockIcon />
+            </FrameBracket>
+            <div className="font-label flex items-center gap-2 text-sm text-primary">
+              <span>ACCESS LOCKED</span>
+              <span aria-hidden="true" className="inline-block h-4 w-px bg-primary motion-safe:animate-pulse" />
+            </div>
+            <p className="font-body text-center text-sm text-text/70">
+              Mission asset <span className="font-label text-primary">{asset.missionId}</span> requires verified operator credentials.
+            </p>
           </div>
-          <p className="font-body text-center text-sm text-text/70">
-            Mission asset <span className="font-label text-primary">{asset.missionId}</span> requires verified operator credentials.
-          </p>
+
+          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+            <div className="space-y-2">
+              <label className="font-label text-xs text-text/70" htmlFor={gameIdInputId}>
+                Game ID
+              </label>
+              <Input
+                aria-label="Game ID"
+                autoComplete="username"
+                disabled={submitting}
+                id={gameIdInputId}
+                name="gameId"
+                placeholder="PILOT-7"
+                value={gameId}
+                onChange={(event) => setGameId(event.currentTarget.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="font-label text-xs text-text/70" htmlFor={personalKeyInputId}>
+                Private Key
+              </label>
+              <Input
+                aria-label="Private Key"
+                autoComplete="current-password"
+                disabled={submitting}
+                id={personalKeyInputId}
+                name="personalKey"
+                placeholder="XXXX-XXXX-XXXX"
+                type="password"
+                value={personalKey}
+                onChange={(event) => setPersonalKey(event.currentTarget.value)}
+              />
+            </div>
+
+            <Button
+              aria-label="START DECRYPTION"
+              className="mt-2 w-full"
+              disabled={submitting}
+              type="submit"
+              variant="primary"
+            >
+              START DECRYPTION
+            </Button>
+          </form>
         </div>
-
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <label className="font-label text-xs text-text/70" htmlFor={gameIdInputId}>
-              Game ID
-            </label>
-            <Input
-              aria-label="Game ID"
-              autoComplete="username"
-              disabled={submitting}
-              id={gameIdInputId}
-              name="gameId"
-              placeholder="PILOT-7"
-              value={gameId}
-              onChange={(event) => setGameId(event.currentTarget.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="font-label text-xs text-text/70" htmlFor={personalKeyInputId}>
-              Private Key
-            </label>
-            <Input
-              aria-label="Private Key"
-              autoComplete="current-password"
-              disabled={submitting}
-              id={personalKeyInputId}
-              name="personalKey"
-              placeholder="XXXX-XXXX-XXXX"
-              type="password"
-              value={personalKey}
-              onChange={(event) => setPersonalKey(event.currentTarget.value)}
-            />
-          </div>
-
-          <Button
-            aria-label="START DECRYPTION"
-            className="mt-2 w-full"
-            disabled={submitting}
-            type="submit"
-            variant="primary"
-          >
-            START DECRYPTION
-          </Button>
-        </form>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
           {FIELD_SPECS.map((field) => (
