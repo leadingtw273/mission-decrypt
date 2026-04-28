@@ -15,3 +15,4 @@ vitest.config.js
 vitest.config.d.ts
 playwright.config.js
 playwright.config.d.ts
+.codex
