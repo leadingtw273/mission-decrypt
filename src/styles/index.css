@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Orbitron";
+  src: url("/fonts/orbitron-variable.woff2") format("woff2-variations");
+  font-weight: 400 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter-variable.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@theme {
+  --color-primary: #FFBA00;
+  --color-secondary: #E0C27A;
+  --color-bg-primary: #0E1116;
+  --color-bg-secondary: #161B22;
+  --color-border: #2A313C;
+  --color-text: #A3ADB8;
+  --color-danger: #E5484D;
+
+  --font-display: "Orbitron", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+
+  /* Letter-spacing tokens for HUD/broadcast feel */
+  --tracking-display: 0.18em;  /* Orbitron headings */
+  --tracking-label: 0.12em;    /* Orbitron UI labels */
+}
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: var(--tracking-display);
+}
+
+.font-label {
+  font-family: var(--font-display);
+  letter-spacing: var(--tracking-label);
+  font-weight: 500;
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg-primary);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
