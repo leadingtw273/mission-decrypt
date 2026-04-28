@@ -48,17 +48,17 @@ export function App() {
   }
 
   return (
-    <main className="min-h-screen bg-bg-primary text-text font-body">
+    <main className="flex min-h-screen flex-col bg-bg-primary text-text font-body">
       <header className="border-b border-border p-4">
         <h1 className="font-display text-primary">STAR CITIZEN // FLEET COMMAND</h1>
         <p className="font-label text-text/70">SECURE COMMUNICATION PROTOCOL</p>
       </header>
 
-      <section className="px-4 py-8">
+      <section className="flex-1 px-4 py-8">
         {renderStateView(state, submit, retry)}
       </section>
 
-      <footer className="mt-8 border-t border-border p-4">
+      <footer className="border-t border-border p-4">
         <span className="font-label text-text/70">FLEET COMMAND // VERSION 1.0.0</span>
       </footer>
 
