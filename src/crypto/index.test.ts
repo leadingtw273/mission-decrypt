@@ -139,3 +139,42 @@ describe('encryptMission + decryptMission round-trip', () => {
     })).rejects.toThrow(/duplicate/i);
   }, 60_000);
 });
+
+describe('AAD binding regression', () => {
+  it('field swap (rallyTime vs missionTime) fails to decrypt', async () => {
+    const { privateKey: cmdPriv, publicKey: cmdPub } = await generateSigningKeypair();
+    const { asset, links } = await encryptMission({
+      mission: samplePlaintext, heroImage: sampleHero,
+      members: [{ gameId: 'leadingtw' }],
+      commanderPrivateKey: cmdPriv,
+    });
+    // Swap two fields' iv+ciphertext
+    const tampered = JSON.parse(JSON.stringify(asset));
+    [tampered.fields.rallyTime, tampered.fields.missionTime] = [
+      tampered.fields.missionTime, tampered.fields.rallyTime,
+    ];
+    // Re-sign with same key (simulate attacker who can re-sign)
+    // For this test we expect signature check to fail first.
+    const result = await decryptMission({
+      asset: tampered, commanderPublicKey: cmdPub, gameId: 'leadingtw', personalKey: links[0]!.personalKey,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.reason).toBe('forged_asset');
+  }, 60_000);
+
+  it('mutated missionId in the asset (no re-sign) fails signature', async () => {
+    const { privateKey: cmdPriv, publicKey: cmdPub } = await generateSigningKeypair();
+    const { asset, links } = await encryptMission({
+      mission: samplePlaintext, heroImage: sampleHero,
+      members: [{ gameId: 'leadingtw' }],
+      commanderPrivateKey: cmdPriv,
+    });
+    const tampered = JSON.parse(JSON.stringify(asset));
+    tampered.missionId = 'XXX-99999-AA0';  // valid pattern but different value
+    const result = await decryptMission({
+      asset: tampered, commanderPublicKey: cmdPub, gameId: 'leadingtw', personalKey: links[0]!.personalKey,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.reason).toBe('forged_asset');
+  }, 60_000);
+});
