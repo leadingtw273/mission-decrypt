@@ -3,8 +3,8 @@
   "cryptoVersion": "1",
   "lookupVersion": "1",
   "normalizationVersion": "1",
-  "missionId": "ANB-1T4OM-QR1",
-  "createdAt": "2026-04-28T09:28:21.680Z",
+  "missionId": "WHN-XFDXT-WA2",
+  "createdAt": "2026-04-28T10:09:04.309Z",
   "params": {
     "kdf": "PBKDF2-HMAC-SHA256",
     "kdfIterations": 600000,
@@ -18,58 +18,58 @@
     "signature": "Ed25519"
   },
   "wrappedKeys": {
-    "zH37AQDPGcbIf2ux1u9XZ7vJvZZHqZYBWTX33ZPaqzw": {
-      "salt": "WEAFrHDvedFC7jSixsBZXQ",
-      "iv": "dkTBtGWNVMBmaHdr",
-      "wrapped": "g3f6J1D7Fvf76I4ITpwCOmxegg0qPZfotkUQU1vAJUknOAD-Dc1eIjTcQlMKbF6P"
+    "TY7zIA-tCG9_YWZT4SgYf1eNruc1Q8GNog9NdstUkFc": {
+      "salt": "Pp69SrAvdzwEC5Sh0kQTpA",
+      "iv": "FjLU3w-ppLR2bIQy",
+      "wrapped": "vlIjOY2iL3E2Kir6rKQ-9I323ErqjPOqOO6YiKqbsABV4dx1rHKeRPxoqw26EacR"
     },
-    "GP7mox6R3aeVzTYeVnPzHBn6RjUM1zyre_aDyw4Ab-c": {
-      "salt": "Jt1dJlnPw-WmeIe3aAhxJA",
-      "iv": "U58432eqPDdrfV4e",
-      "wrapped": "qwnMft9DDIHifNNgKFh5wsYOYEFkA32BjWJ5ImjOddfegJvXSmMtwHImeA74-oE3"
+    "Zn02zLK2flp8ZiTP87h12BaTGHMHjJg-tX7mb-XOfDw": {
+      "salt": "C-8l3rPNk2IVcJnRlE7FFw",
+      "iv": "rgL3iv7Y9VRph5M7",
+      "wrapped": "5Mo1cDRG-YK67CQ6xJjv6Sr9E6lajemPvdJoHFLF-hmlY-vfF1jB8anpwhy-vyJx"
     }
   },
   "fields": {
     "missionCommander": {
-      "iv": "nhr2G7BH0-g-Tjd6",
-      "ciphertext": "7MU1yh1Rqsps26FRgdkQyDaJHIhZKBctbJb4vxyknR0b-iXzBrNuQw"
+      "iv": "hU7Ltggsq6eiDn7b",
+      "ciphertext": "SkeKN0XjZCnkPWUi7mFF788MJ6gXkWJDJoZ9Yqrezgi3yPx9Ul8aMQ"
     },
     "communicationChannel": {
-      "iv": "Buazu3abeQpAsih8",
-      "ciphertext": "-8HP-sK8YEKlMLOKjZKwvOTDRIyVDSayF0shlsfKk-A4zsK2hMo7zqjyPJAeguk"
+      "iv": "xI8k6a_HV7tK1LhH",
+      "ciphertext": "ANlweIyQo--Fn-Xc8z-Abr-8ylgz1TARuCgOiU-GJ-Apl4ebnn32gJDc8dAkLfY"
     },
     "missionTime": {
-      "iv": "kLMHbQnPh6CjFrlG",
-      "ciphertext": "IZb421SYGVGBl1z-DEjXnFr5rizzjWPvS8J9ERUOWT8q13tnf0A"
+      "iv": "TLQrvchJxY7qiwk2",
+      "ciphertext": "u7afWOI2-8zEwGz2ULmjoR9FFdVZ691zscbI8AtxpTbYsjfY0Ak"
     },
     "rallyTime": {
-      "iv": "Qg9lrw0dluX6x86T",
-      "ciphertext": "d-mBM-o7RC88XOZnjJrdHrDdUsnZndbBzHLDuN8kTWPDa8B-_UU"
+      "iv": "h5cxMGlM85TCvZGl",
+      "ciphertext": "IatFO5bgcG9uYq-QVjrP88NlDcsfaBT-E7iGWQP7S8q4Vptp3Zw"
     },
     "rallyLocation": {
-      "iv": "jDwOCBySSQ4S0Vdz",
-      "ciphertext": "CPJuWOvymH-n8QEAYo2c5hrSXIy-D4aKxsdk5-jceP1lUnJrnHlXg217iL0"
+      "iv": "OinAH4QouRaMxM3p",
+      "ciphertext": "BDy-a3YCink1zFd1cZmpOJu5X9hjOiMT-3wt9noYoPZjEjyCjXdycNmLHdY"
     },
     "requiredGear": {
-      "iv": "AF3d_5Thuec8aIMh",
-      "ciphertext": "vTtym1tsIWHKdSHVBoh0k_V149TMJ4SgpCVADg1n2ESaukf-yjIzgqv5dnj7IpGO0x77voMu2dsFwA_NLdZ-"
+      "iv": "X5lWrGoU_p9Vsm5L",
+      "ciphertext": "lu8Cd3KKqX_4vuDS7qRcI6u-8tfYcP-ZSNmPF6MDi77h7-SHlmi-RQZeGlb3A6KryccFyyxjz0I-u5JY80Ob"
     },
     "accessPermission": {
-      "iv": "-eYhh0Ylljj_M0iY",
-      "ciphertext": "t5_sJe4WLzRfr_0DCogSu7-xnH5-cBdT-yqGh0evdxqC5g"
+      "iv": "neH-Gvy3xMrnXYD8",
+      "ciphertext": "vi4sqyfr63OUiW3PufFS-zCWwB4DZom3H4d9ZxHf_8-8nA"
     },
     "rewardDistribution": {
-      "iv": "njcmXnmacqnSjlRL",
-      "ciphertext": "j-qp_KTwMwS4j1JUJPM3a-SEjdrPcPLItiYIRIIfVd41ACwzge-OvzXiEXtwLnOhewaL"
+      "iv": "iL_hUpcGk0uxHAx-",
+      "ciphertext": "UA9HC3gk78gyrtQHUjfntZdtmudMpEbbqXe-_PGIDDowmdHx5tfGTDAUOB0EVuvm9qut"
     },
     "missionBrief": {
-      "iv": "T3sg8JAl3mEo2COZ",
-      "ciphertext": "VEwjlnoV9vZdZ2ljO5hjjN8Mfs42HdUo7rva8_b2LwY0T_rmcxPNBxfLUtWcUdQ1z5NgzajRPRoNm6WtAQ0DK8cGa3zy2Qnbsi87_p4uwrACNYvNBQ0jwnhlocDO2iHWqAs4J7do"
+      "iv": "6SFd-N39Hh4BV4nL",
+      "ciphertext": "VrJ7l9f7OHP8Ev0dnNKLGAIh1LRNd0KcCxcoIrcIaSzWdMQX8D7AS_9sTyBp7hC5qOL1W5MzPbmGaYwiAdMWDWZN_y7Ebki_Hwq0VBI-1nZlQNOqJhhXw19Wde4Yz0wuUDj2uwTi"
     }
   },
   "heroImage": {
-    "iv": "r_isCqQddEgZOUJi",
-    "ciphertext": "rv1mK6Uc01ippkr64CcA1amLvEfN20iyHF4_Q95DkLxvQrcG5Ak",
+    "iv": "5RhXn_LnwQejcBiU",
+    "ciphertext": "AoYhTXUxXntLFckphpaNPCZK9_Bgb1QXJc_YlfB42wSNn9vZ26U",
     "metadata": {
       "mimeType": "image/jpeg",
       "byteLength": 22,
@@ -79,6 +79,6 @@
   "signature": {
     "alg": "Ed25519",
     "publicKeyFingerprint": "Kq2oFVErhzzV7Q2PCeLQ0g",
-    "value": "_uj04dLRLCuRKlkQHj_4PwycuG13tcaKmL8ICWp0b8sHK5IIQilqlfXMtVOcy4UAnf7Lk-SOopwPvsMXczMtAA"
+    "value": "57BPYJuaaLewvk38kV0tZsUsyhVoxuuU6h8s3htuUb_4Rdrjcb1eckAHbOeeoSa9YozmfkfUQnKQNeiBS4MdDw"
   }
 }
