@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { toBase64Url, fromBase64Url, canonicalJSON, utf8Encode, utf8Decode } from './codec';
+import { toBase64Url, fromBase64Url, canonicalJSON, utf8Encode, utf8Decode, hmacSha256 } from './codec';
 
 describe('base64url', () => {
   it('round-trips bytes', () => {
@@ -61,5 +61,24 @@ describe('utf8 helpers', () => {
 
   it('round-trips emoji + non-Latin', () => {
     expect(utf8Decode(utf8Encode('星際公民 🚀'))).toBe('星際公民 🚀');
+  });
+});
+
+describe('hmacSha256', () => {
+  it('produces 32-byte digest', async () => {
+    const out = await hmacSha256(new TextEncoder().encode('key'), new TextEncoder().encode('msg'));
+    expect(out).toHaveLength(32);
+  });
+
+  it('is deterministic', async () => {
+    const a = await hmacSha256(new TextEncoder().encode('k'), new TextEncoder().encode('m'));
+    const b = await hmacSha256(new TextEncoder().encode('k'), new TextEncoder().encode('m'));
+    expect(a).toEqual(b);
+  });
+
+  it('different key produces different digest', async () => {
+    const a = await hmacSha256(new TextEncoder().encode('k1'), new TextEncoder().encode('m'));
+    const b = await hmacSha256(new TextEncoder().encode('k2'), new TextEncoder().encode('m'));
+    expect(a).not.toEqual(b);
   });
 });

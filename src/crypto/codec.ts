@@ -47,3 +47,15 @@ function replacer(_key: string, val: unknown): unknown {
   }
   return val;
 }
+
+export async function hmacSha256(key: Uint8Array, message: Uint8Array): Promise<Uint8Array> {
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw',
+    new Uint8Array(key).buffer as ArrayBuffer,
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const buf = await crypto.subtle.sign('HMAC', cryptoKey, new Uint8Array(message).buffer as ArrayBuffer);
+  return new Uint8Array(buf);
+}
