@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./animations.css";
 
 @font-face {
   font-family: "Orbitron";
@@ -29,6 +30,42 @@
   /* Letter-spacing tokens for HUD/broadcast feel */
   --tracking-display: 0.18em;  /* Orbitron headings */
   --tracking-label: 0.12em;    /* Orbitron UI labels */
+}
+
+@utility bg-primary {
+  background-color: var(--color-primary);
+}
+
+@utility bg-bg-primary {
+  background-color: var(--color-bg-primary);
+}
+
+@utility bg-bg-secondary {
+  background-color: var(--color-bg-secondary);
+}
+
+@utility text-bg-primary {
+  color: var(--color-bg-primary);
+}
+
+@utility text-primary {
+  color: var(--color-primary);
+}
+
+@utility text-text {
+  color: var(--color-text);
+}
+
+@utility text-danger {
+  color: var(--color-danger);
+}
+
+@utility border-border {
+  border-color: var(--color-border);
+}
+
+@utility border-primary {
+  border-color: var(--color-primary);
 }
 
 .font-display {

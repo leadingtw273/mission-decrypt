@@ -1,0 +1,49 @@
+@keyframes scanner-sweep-loop {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes progress-segment-pulse {
+  0%,
+  100% {
+    background-color: color-mix(in srgb, var(--color-primary) 15%, transparent);
+    border-color: var(--color-border);
+  }
+
+  50% {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+}
+
+.scanner-sweep-line {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--color-primary) 28%, transparent) 18%,
+    var(--color-primary) 50%,
+    color-mix(in srgb, var(--color-primary) 28%, transparent) 82%,
+    transparent 100%
+  );
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-primary) 65%, transparent);
+  animation: scanner-sweep-loop 800ms linear infinite;
+}
+
+.progress-segment-indeterminate {
+  animation: progress-segment-pulse 800ms ease-in-out infinite;
+}
