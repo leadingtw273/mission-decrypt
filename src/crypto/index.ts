@@ -166,15 +166,10 @@ export async function encryptMission(input: {
 }
 
 async function deriveCommanderPublicKey(privateKey: CryptoKey): Promise<CryptoKey> {
-  // Web Crypto requires deriving public key from JWK export
+  // Web Crypto requires deriving public key from JWK export (strip the 'd' private field)
   const jwk = await crypto.subtle.exportKey('jwk', privateKey);
-  return crypto.subtle.importKey(
-    'jwk',
-    { kty: jwk.kty, crv: jwk.crv, x: jwk.x },
-    { name: 'Ed25519' },
-    true,
-    ['verify'],
-  );
+  const pubJwk: JsonWebKey = { kty: jwk.kty, crv: jwk.crv, x: jwk.x };
+  return crypto.subtle.importKey('jwk', pubJwk, { name: 'Ed25519' }, true, ['verify']);
 }
 
 export async function decryptMission(input: {
