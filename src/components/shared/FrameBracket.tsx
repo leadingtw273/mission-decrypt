@@ -11,14 +11,14 @@ export function FrameBracket({ size, color, className, children }: FrameBracketP
   const cornerStyle = { width: size, height: size, color: resolvedColor } as const;
 
   return (
-    <div className={joinClasses('relative inline-flex items-center justify-center', className)}>
+    <div className={joinClasses('relative flex items-center justify-center', className)}>
       <div className="pointer-events-none absolute inset-0">
         <Corner className="left-0 top-0" position="top-left" style={cornerStyle} />
         <Corner className="right-0 top-0" position="top-right" style={cornerStyle} />
         <Corner className="bottom-0 left-0" position="bottom-left" style={cornerStyle} />
         <Corner className="bottom-0 right-0" position="bottom-right" style={cornerStyle} />
       </div>
-      <div className="relative z-10">{children}</div>
+      <div className="relative z-10 flex h-full w-full items-center justify-center">{children}</div>
     </div>
   );
 }

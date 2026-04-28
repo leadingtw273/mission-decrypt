@@ -46,17 +46,17 @@ export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps)
         <CheckmarkIcon />
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(280px,0.9fr)_minmax(0,1.3fr)] lg:items-start">
-        <div className="flex justify-center lg:justify-start">
+      <div className="grid gap-8 lg:grid-cols-2 lg:items-stretch">
+        <div className="flex justify-center lg:block lg:h-full">
           <FrameBracket
             size={28}
             color="primary"
-            className="w-full max-w-[320px] overflow-hidden border border-primary/30 bg-bg-primary/70 p-3"
+            className="w-full max-w-[320px] overflow-hidden border border-primary/30 bg-bg-primary/70 p-3 lg:h-full lg:max-w-none lg:p-0"
           >
             {heroImageUrl ? (
               <img
                 alt={heroImage.altText}
-                className="aspect-[4/5] w-full object-cover"
+                className="aspect-[4/5] w-full object-cover lg:aspect-auto lg:h-full"
                 src={heroImageUrl}
               />
             ) : null}
