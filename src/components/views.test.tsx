@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { MissionAssetV1, MissionPlaintext } from '../crypto';
 import { DecryptedView } from './DecryptedView';
 import { DecryptingView } from './DecryptingView';
+import { ErrorView } from './ErrorView';
 import { LockedView, toGibberish } from './LockedView';
 
 const sampleAsset: MissionAssetV1 = {
@@ -184,5 +185,37 @@ describe('DecryptedView', () => {
     unmount();
 
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:mission-hero');
+  });
+});
+
+describe('ErrorView', () => {
+  it('renders forged_asset warning text with danger styling', () => {
+    render(<ErrorView reason="forged_asset" retryable={false} />);
+
+    expect(screen.getByRole('alert')).toHaveAttribute('aria-live', 'assertive');
+    expect(screen.getByText('⚠️ MISSION SIGNATURE INVALID — DO NOT TRUST')).toHaveClass('text-danger');
+  });
+
+  it('shows retry button for not_found', () => {
+    render(<ErrorView reason="not_found" retryable />);
+
+    expect(screen.getByRole('button', { name: 'RETRY' })).toBeInTheDocument();
+  });
+
+  it('does not show retry button for unsupported_env', () => {
+    render(<ErrorView reason="unsupported_env" retryable={false} />);
+
+    expect(screen.queryByRole('button', { name: 'RETRY' })).not.toBeInTheDocument();
+  });
+
+  it('triggers onRetry when retry button is clicked', async () => {
+    const user = userEvent.setup();
+    const onRetry = vi.fn();
+
+    render(<ErrorView reason="auth_failed" retryable onRetry={onRetry} />);
+
+    await user.click(screen.getByRole('button', { name: 'RETRY' }));
+
+    expect(onRetry).toHaveBeenCalledTimes(1);
   });
 });
