@@ -7,12 +7,13 @@ import type { GenerateMissionResult } from './generateMission';
 
 export interface PostGenerationViewProps {
   result: GenerateMissionResult;
+  commanderPublicKeyFingerprint?: string | null;
   onClose: () => void;
 }
 
 const downloadedMissionIds = new Set<string>();
 
-export function PostGenerationView({ result, onClose }: PostGenerationViewProps) {
+export function PostGenerationView({ result, commanderPublicKeyFingerprint, onClose }: PostGenerationViewProps) {
   const downloadedRef = useRef(false);
 
   useEffect(() => {
@@ -44,6 +45,12 @@ export function PostGenerationView({ result, onClose }: PostGenerationViewProps)
         <p className="font-body text-sm text-text/78">
           Mission ID: <span className="font-label text-primary">{result.missionId}</span>
         </p>
+        {commanderPublicKeyFingerprint ? (
+          <p className="font-body text-sm text-text/78">
+            Commander fingerprint: <span className="font-label text-primary">{commanderPublicKeyFingerprint}</span>. Update the
+            build-time commander public key before deployment if this fingerprint does not match the deployed build.
+          </p>
+        ) : null}
       </div>
 
       <FrameBracket

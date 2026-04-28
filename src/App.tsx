@@ -1,12 +1,51 @@
+import { useEffect, useState } from 'react';
+
+import { AuthoringModal } from './authoring/AuthoringModal';
+import { generateMission } from './authoring/generateMission';
+import type { CommanderIdentity } from './authoring/identity';
+import { loadIdentity, saveIdentity } from './authoring/identity';
 import { DecryptedView } from './components/DecryptedView';
 import { DecryptingView } from './components/DecryptingView';
 import { ErrorView } from './components/ErrorView';
 import { LockedView } from './components/LockedView';
+import { generateSigningKeypair } from './crypto/sign';
 import { useDecryptionMachine } from './decryption/useDecryptionMachine';
 
 export function App() {
   const missionId = new URLSearchParams(location.search).get('mission_id');
   const { state, submit, retry } = useDecryptionMachine(missionId);
+  const [authoringModalOpen, setAuthoringModalOpen] = useState(false);
+  const [identity, setIdentity] = useState<CommanderIdentity | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void loadIdentity().then((nextIdentity) => {
+      if (!cancelled) {
+        setIdentity(nextIdentity);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    function handleOpenAuthoring() {
+      setAuthoringModalOpen(true);
+    }
+
+    window.addEventListener('fleetops:open-authoring', handleOpenAuthoring);
+    return () => window.removeEventListener('fleetops:open-authoring', handleOpenAuthoring);
+  }, []);
+
+  async function handleGenerateIdentity() {
+    const keypair = await generateSigningKeypair();
+    await saveIdentity(keypair);
+    setIdentity(keypair);
+    return keypair;
+  }
 
   return (
     <main className="min-h-screen bg-bg-primary text-text font-body">
@@ -22,6 +61,14 @@ export function App() {
       <footer className="mt-8 border-t border-border p-4">
         <span className="font-label text-text/70">FLEET COMMAND // VERSION 1.0.0</span>
       </footer>
+
+      <AuthoringModal
+        open={authoringModalOpen}
+        onClose={() => setAuthoringModalOpen(false)}
+        onGenerate={generateMission}
+        identity={identity}
+        onGenerateIdentity={handleGenerateIdentity}
+      />
     </main>
   );
 }

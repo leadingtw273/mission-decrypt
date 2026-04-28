@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { MissionAssetV1 } from './crypto';
@@ -8,11 +9,42 @@ const { mockUseDecryptionMachine } = vi.hoisted(() => ({
   mockUseDecryptionMachine: vi.fn(),
 }));
 
+const {
+  mockLoadIdentity,
+  mockSaveIdentity,
+  mockGenerateMission,
+  mockGenerateSigningKeypair,
+} = vi.hoisted(() => ({
+  mockLoadIdentity: vi.fn(),
+  mockSaveIdentity: vi.fn(),
+  mockGenerateMission: vi.fn(),
+  mockGenerateSigningKeypair: vi.fn(),
+}));
+
 vi.mock('./decryption/useDecryptionMachine', () => ({
   useDecryptionMachine: mockUseDecryptionMachine,
 }));
 
+vi.mock('./authoring/identity', () => ({
+  loadIdentity: mockLoadIdentity,
+  saveIdentity: mockSaveIdentity,
+}));
+
+vi.mock('./authoring/generateMission', () => ({
+  generateMission: mockGenerateMission,
+}));
+
+vi.mock('./crypto/sign', async () => {
+  const actual = await vi.importActual<typeof import('./crypto/sign')>('./crypto/sign');
+
+  return {
+    ...actual,
+    generateSigningKeypair: mockGenerateSigningKeypair,
+  };
+});
+
 import { App } from './App';
+import type { CommanderIdentity } from './authoring/identity';
 
 const sampleAsset: MissionAssetV1 = {
   schemaVersion: '1',
@@ -71,11 +103,28 @@ function setMockState(state: State) {
   });
 }
 
+const sampleIdentity = {
+  publicKey: {} as CryptoKey,
+  privateKey: {} as CryptoKey,
+} satisfies CommanderIdentity;
+
 describe('App', () => {
   beforeEach(() => {
     mockUseDecryptionMachine.mockReset();
+    mockLoadIdentity.mockReset();
+    mockSaveIdentity.mockReset();
+    mockGenerateMission.mockReset();
+    mockGenerateSigningKeypair.mockReset();
     window.history.replaceState({}, '', '/');
     setMockState({ kind: 'BOOTSTRAPPING' });
+    mockLoadIdentity.mockResolvedValue(null);
+    mockSaveIdentity.mockResolvedValue(undefined);
+    mockGenerateMission.mockResolvedValue({
+      missionId: 'ABC-12345-DE6',
+      asset: sampleAsset,
+      links: [],
+    });
+    mockGenerateSigningKeypair.mockResolvedValue(sampleIdentity);
   });
 
   it('renders header and footer chrome', () => {
@@ -113,5 +162,44 @@ describe('App', () => {
 
     expect(screen.getByText(/requires verified operator credentials\./i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'START DECRYPTION' })).toBeInTheDocument();
+  });
+
+  it('opens the authoring modal when fleetops:open-authoring is dispatched', async () => {
+    render(<App />);
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent('fleetops:open-authoring'));
+    });
+
+    expect(await screen.findByRole('dialog', { name: 'Commander authoring modal' })).toBeInTheDocument();
+  });
+
+  it('shows identity setup when no commander identity is stored', async () => {
+    render(<App />);
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent('fleetops:open-authoring'));
+    });
+
+    expect(await screen.findByText('Identity Setup')).toBeInTheDocument();
+    expect(screen.getByText('No commander identity detected.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Generate Commander Identity' })).toBeInTheDocument();
+  });
+
+  it('switches from setup to authoring after generating an identity', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent('fleetops:open-authoring'));
+    });
+
+    await user.click(await screen.findByRole('button', { name: 'Generate Commander Identity' }));
+
+    await waitFor(() => {
+      expect(mockGenerateSigningKeypair).toHaveBeenCalledTimes(1);
+      expect(mockSaveIdentity).toHaveBeenCalledWith(sampleIdentity);
+    });
+    expect(await screen.findByRole('textbox', { name: 'Mission Commander' })).toBeInTheDocument();
   });
 });

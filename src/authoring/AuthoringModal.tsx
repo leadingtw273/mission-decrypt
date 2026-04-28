@@ -16,6 +16,7 @@ import { PostGenerationView } from './PostGenerationView';
 import { Button } from '../components/shared/Button';
 import { FrameBracket } from '../components/shared/FrameBracket';
 import { Input } from '../components/shared/Input';
+import { fingerprint } from '../crypto/sign';
 
 export interface AuthoringModalProps {
   open: boolean;
@@ -82,6 +83,7 @@ export function AuthoringModal({
   const [isGeneratingIdentity, setIsGeneratingIdentity] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generatedResult, setGeneratedResult] = useState<GenerateMissionResult | null>(null);
+  const [generatedFingerprint, setGeneratedFingerprint] = useState<string | null>(null);
 
   const effectiveIdentity = identity ?? localIdentity;
   const dirty = useMemo(
@@ -98,6 +100,7 @@ export function AuthoringModal({
       setPhase(identity ? 'authoring' : 'identity-setup');
       setLocalIdentity(null);
       setGeneratedResult(null);
+      setGeneratedFingerprint(null);
       setMission(EMPTY_FORM);
       setHeroAltText('');
       setHeroImage(null);
@@ -179,6 +182,11 @@ export function AuthoringModal({
         identity: { privateKey: effectiveIdentity.privateKey },
       });
       setGeneratedResult(result);
+      try {
+        setGeneratedFingerprint(await fingerprint(effectiveIdentity.publicKey));
+      } catch {
+        setGeneratedFingerprint(null);
+      }
       setPhase('post-generation');
     } finally {
       setIsSubmitting(false);
@@ -289,7 +297,13 @@ export function AuthoringModal({
             ) : null}
 
             {phase === 'post-generation' ? (
-              generatedResult ? <PostGenerationView result={generatedResult} onClose={onClose} /> : null
+              generatedResult ? (
+                <PostGenerationView
+                  result={generatedResult}
+                  commanderPublicKeyFingerprint={generatedFingerprint}
+                  onClose={onClose}
+                />
+              ) : null
             ) : null}
           </section>
         </FrameBracket>

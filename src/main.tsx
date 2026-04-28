@@ -2,6 +2,17 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles/index.css';
 import { App } from './App';
+import {
+  CONSOLE_BANNER,
+  createFleetOps,
+  registerFleetOpsOnWindow,
+} from './authoring/fleetOps';
+import {
+  exportIdentityJwk,
+  getCommanderPublicKeyFingerprint,
+  importIdentityJwk,
+  loadIdentity,
+} from './authoring/identity';
 import { encryptMission, decryptMission } from './crypto';
 import { generateSigningKeypair } from './crypto/sign';
 
@@ -33,6 +44,20 @@ if (new URLSearchParams(location.search).has('cross-browser-harness')) {
     },
   };
 }
+
+console.log(CONSOLE_BANNER);
+
+const fleetOps = createFleetOps({
+  openAuthoringModal() {
+    window.dispatchEvent(new CustomEvent('fleetops:open-authoring'));
+  },
+  loadIdentity,
+  exportIdentityJwk,
+  importIdentityJwk,
+  getCommanderPublicKeyFingerprint,
+});
+
+registerFleetOpsOnWindow(fleetOps);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
