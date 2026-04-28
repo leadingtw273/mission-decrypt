@@ -37,7 +37,9 @@ export function validatePersonalKey(input: string): boolean {
 }
 
 function checksum(body: string): string {
-  // Sum of alphabet indices mod 32 — simple, catches most single-char typos
+  // Sum of alphabet indices mod 32 — catches single-char substitutions
+  // (100% for ±1 substitutions, ~31/32 for arbitrary). Does NOT detect
+  // transpositions by design: the checksum is for typo guard, not integrity.
   let sum = 0;
   for (const ch of body) sum += ALPHABET_INDEX.get(ch)!;
   return ALPHABET[sum % 32]!;

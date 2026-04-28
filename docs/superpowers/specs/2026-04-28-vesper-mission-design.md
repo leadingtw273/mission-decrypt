@@ -15,7 +15,7 @@
 | 防止指揮官 console history 殘留 | 部分 | Hybrid UX 用 in-page modal 收輸入，避免長字串進 console history |
 | 防止部署主機被入侵 | ❌ | 假設 Vercel/CF Pages、git repo、commander 本機是 trusted |
 | 防止瀏覽器惡意 extension | ❌ | 此類威脅需 OS 層 sandbox，非本系統 scope |
-| 防止離線爆破 personalKey | ✅ | 16-char base32 ≈ 80 bits + PBKDF2 SHA-256 ≥600k iter，運算上不可行 |
+| 防止離線爆破 personalKey | ✅ | 16-char base32 (15 payload + 1 checksum) = 75 bits + PBKDF2 SHA-256 ≥600k iter，運算上不可行 |
 
 ## 1. Locked Premises (使用者已確認)
 
