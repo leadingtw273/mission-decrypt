@@ -110,7 +110,7 @@ export function LockedView({ asset, onSubmit, submitting }: LockedViewProps) {
           </form>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+        <div className="grid gap-4">
           {FIELD_SPECS.map((field) => (
             <div key={field.name} className="border border-border bg-bg-primary/55 px-4 py-3">
               <p className="font-label text-[11px] text-text/70">{field.label}</p>
