@@ -45,8 +45,8 @@ export function LockedView({ asset, onSubmit, submitting }: LockedViewProps) {
 
   return (
     <section className="border border-border bg-bg-secondary/60 px-6 py-8 shadow-[0_0_40px_rgba(255,186,0,0.06)] md:px-8">
-      <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
-        <div className="flex flex-col gap-8">
+      <div className="grid gap-8 lg:grid-cols-2">
+        <div className="flex flex-col gap-8 lg:justify-center">
           <div className="flex flex-col items-center justify-center gap-5">
             <FrameBracket
               size={26}
