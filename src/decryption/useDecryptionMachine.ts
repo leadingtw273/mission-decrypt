@@ -17,11 +17,11 @@ export function useDecryptionMachine(missionId: string | null): {
       return;
     }
     if (!missionId) {
-      dispatch({ type: 'ENV_FAIL' });
+      dispatch({ type: 'ENV_FAIL', reason: 'missing_mission_id' });
       return;
     }
     if (typeof crypto === 'undefined' || !crypto.subtle) {
-      dispatch({ type: 'ENV_FAIL' });
+      dispatch({ type: 'ENV_FAIL', reason: 'unsupported_env' });
       return;
     }
     dispatch({ type: 'ENV_OK', missionId });

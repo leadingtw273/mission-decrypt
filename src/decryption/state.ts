@@ -19,7 +19,7 @@ type DecryptFailReason = 'auth_failed' | 'cipher_corrupt' | 'invalid_personal_ke
 
 export type Action =
   | { type: 'ENV_OK'; missionId: string }
-  | { type: 'ENV_FAIL' }
+  | { type: 'ENV_FAIL'; reason: 'missing_mission_id' | 'unsupported_env' }
   | { type: 'ASSET_LOADED'; asset: MissionAssetV1 }
   | { type: 'ASSET_FAILED'; reason: AssetFailedReason }
   | { type: 'SUBMIT'; gameId: string; personalKey: string }
@@ -36,7 +36,7 @@ export function reducer(state: State, action: Action): State {
         return { kind: 'ASSET_LOADING', missionId: action.missionId };
       }
       if (action.type === 'ENV_FAIL') {
-        return { kind: 'ERROR', reason: 'unsupported_env', retryable: false };
+        return { kind: 'ERROR', reason: action.reason, retryable: false };
       }
       return warnInvalidTransition(state, action);
 

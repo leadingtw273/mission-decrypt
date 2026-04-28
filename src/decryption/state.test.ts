@@ -82,8 +82,16 @@ describe('decryption state reducer', () => {
     });
   });
 
-  it('BOOTSTRAPPING + ENV_FAIL -> ERROR(unsupported_env, retryable=false)', () => {
-    expect(reducer(initialState, { type: 'ENV_FAIL' })).toEqual({
+  it('BOOTSTRAPPING + ENV_FAIL(missing_mission_id) -> ERROR(missing_mission_id, retryable=false)', () => {
+    expect(reducer(initialState, { type: 'ENV_FAIL', reason: 'missing_mission_id' })).toEqual({
+      kind: 'ERROR',
+      reason: 'missing_mission_id',
+      retryable: false,
+    });
+  });
+
+  it('BOOTSTRAPPING + ENV_FAIL(unsupported_env) -> ERROR(unsupported_env, retryable=false)', () => {
+    expect(reducer(initialState, { type: 'ENV_FAIL', reason: 'unsupported_env' })).toEqual({
       kind: 'ERROR',
       reason: 'unsupported_env',
       retryable: false,
