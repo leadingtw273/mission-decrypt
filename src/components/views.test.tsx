@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { MissionAssetV1 } from '../crypto';
+import { DecryptingView } from './DecryptingView';
 import { LockedView, toGibberish } from './LockedView';
 
 const sampleAsset: MissionAssetV1 = {
@@ -88,5 +89,19 @@ describe('LockedView', () => {
   it('maps the same ciphertext to the same gibberish deterministically', () => {
     expect(toGibberish('AbCdEf123_-', 18)).toBe(toGibberish('AbCdEf123_-', 18));
     expect(toGibberish('AbCdEf123_-', 18)).toMatch(/^[%$@!#^&*()_+\[\]{};'\"<>?\/~]+$/);
+  });
+});
+
+describe('DecryptingView', () => {
+  it('renders DECRYPTING text', () => {
+    render(<DecryptingView />);
+
+    expect(screen.getByText('DECRYPTING...')).toBeInTheDocument();
+  });
+
+  it('has role=status and aria-live=polite', () => {
+    render(<DecryptingView />);
+
+    expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite');
   });
 });
