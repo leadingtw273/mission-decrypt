@@ -37,6 +37,6 @@ describe('Ed25519 sign/verify', () => {
     const fp1 = await fingerprint(publicKey);
     const fp2 = await fingerprint(publicKey);
     expect(fp1).toBe(fp2);
-    expect(fp1.length).toBeGreaterThan(0);
+    expect(fp1.length).toBe(22);  // base64url of 16 bytes = 22 chars (no padding)
   });
 });
