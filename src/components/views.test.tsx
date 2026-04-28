@@ -2,7 +2,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { MissionAssetV1 } from '../crypto';
+import type { MissionAssetV1, MissionPlaintext } from '../crypto';
+import { DecryptedView } from './DecryptedView';
 import { DecryptingView } from './DecryptingView';
 import { LockedView, toGibberish } from './LockedView';
 
@@ -55,6 +56,42 @@ const sampleAsset: MissionAssetV1 = {
   },
 };
 
+const sampleMission: MissionPlaintext = {
+  missionCommander: 'Commander Lyra Voss',
+  communicationChannel: 'VHF-7 encrypted relay',
+  missionTime: '23:40 UTC',
+  rallyTime: '23:10 UTC',
+  rallyLocation: 'Pier 19, East Harbor',
+  requiredGear: 'Thermal cloak, relay beacon, sidearm',
+  accessPermission: 'Level 4 dock clearance',
+  rewardDistribution: '40/30/20/10 split',
+  missionBrief: 'Extract the courier and secure the black case before dawn.',
+};
+
+const sampleHeroImage = {
+  mimeType: 'image/png',
+  bytes: new Uint8Array([137, 80, 78, 71]),
+  altText: 'Fog-covered docks at night',
+};
+
+function mockObjectUrlApis() {
+  const createObjectURL = vi.fn<(obj: Blob | MediaSource) => string>(() => 'blob:mission-hero');
+  const revokeObjectURL = vi.fn<(url: string) => void>();
+
+  Object.defineProperty(URL, 'createObjectURL', {
+    configurable: true,
+    writable: true,
+    value: createObjectURL,
+  });
+  Object.defineProperty(URL, 'revokeObjectURL', {
+    configurable: true,
+    writable: true,
+    value: revokeObjectURL,
+  });
+
+  return { createObjectURL, revokeObjectURL };
+}
+
 describe('LockedView', () => {
   it('renders mission field labels and ciphertext gibberish', () => {
     render(<LockedView asset={sampleAsset} onSubmit={vi.fn()} submitting={false} />);
@@ -103,5 +140,49 @@ describe('DecryptingView', () => {
     render(<DecryptingView />);
 
     expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite');
+  });
+});
+
+describe('DecryptedView', () => {
+  it('renders all 9 mission fields with real values', () => {
+    mockObjectUrlApis();
+
+    render(<DecryptedView heroImage={sampleHeroImage} mission={sampleMission} />);
+
+    expect(screen.getByText('MISSION COMMANDER')).toHaveClass('font-label');
+    expect(screen.getByText(sampleMission.missionCommander)).toHaveClass('font-body');
+    expect(screen.getByText('COMMUNICATION CHANNEL')).toHaveClass('font-label');
+    expect(screen.getByText(sampleMission.communicationChannel)).toHaveClass('font-body');
+    expect(screen.getByText('MISSION TIME')).toHaveClass('font-label');
+    expect(screen.getByText(sampleMission.missionTime)).toHaveClass('font-body');
+    expect(screen.getByText('RALLY TIME')).toHaveClass('font-label');
+    expect(screen.getByText(sampleMission.rallyTime)).toHaveClass('font-body');
+    expect(screen.getByText('RALLY LOCATION')).toHaveClass('font-label');
+    expect(screen.getByText(sampleMission.rallyLocation)).toHaveClass('font-body');
+    expect(screen.getByText('REQUIRED GEAR')).toHaveClass('font-label');
+    expect(screen.getByText(sampleMission.requiredGear)).toHaveClass('font-body');
+    expect(screen.getByText('ACCESS PERMISSION')).toHaveClass('font-label');
+    expect(screen.getByText(sampleMission.accessPermission)).toHaveClass('font-body');
+    expect(screen.getByText('REWARD DISTRIBUTION')).toHaveClass('font-label');
+    expect(screen.getByText(sampleMission.rewardDistribution)).toHaveClass('font-body');
+    expect(screen.getByText('MISSION BRIEF')).toHaveClass('font-label');
+    expect(screen.getByText(sampleMission.missionBrief)).toHaveClass('font-body');
+    expect(screen.getByRole('img', { name: sampleHeroImage.altText })).toHaveAttribute('src', 'blob:mission-hero');
+  });
+
+  it('creates and revokes object URL for hero image', () => {
+    const { createObjectURL, revokeObjectURL } = mockObjectUrlApis();
+
+    const { unmount } = render(<DecryptedView heroImage={sampleHeroImage} mission={sampleMission} />);
+    const blobArg = createObjectURL.mock.calls.at(0)?.[0];
+
+    expect(createObjectURL).toHaveBeenCalledTimes(1);
+    expect(blobArg).toBeInstanceOf(Blob);
+    expect(blobArg).toMatchObject({ type: sampleHeroImage.mimeType });
+    expect(revokeObjectURL).not.toHaveBeenCalled();
+
+    unmount();
+
+    expect(revokeObjectURL).toHaveBeenCalledWith('blob:mission-hero');
   });
 });
