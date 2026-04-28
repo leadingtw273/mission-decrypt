@@ -5,7 +5,11 @@ import {
 import { fromBase64Url } from '../crypto/codec';
 import { fingerprint, importPublicKey } from '../crypto/sign';
 
-export const COMMANDER_PUBLIC_KEY_B64URL = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+// v1 demo: production placeholder is the same key as dev test, so _example.json
+// verifies on the deployed site without requiring a real commander identity yet.
+// Replace this with your own commander public key (from fleetOps.whoAmI())
+// once you generate a real identity, then redeploy.
+export const COMMANDER_PUBLIC_KEY_B64URL = 'K2OiYxIl8Fj18xXYEQhmdK-b_4Z0WYdCWF_EqwgKr0g';
 export const COMMANDER_PUBLIC_KEY_PLACEHOLDER = COMMANDER_PUBLIC_KEY_B64URL;
 export const DEV_TEST_COMMANDER_PUBLIC_KEY_B64URL = 'K2OiYxIl8Fj18xXYEQhmdK-b_4Z0WYdCWF_EqwgKr0g';
 

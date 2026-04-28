@@ -28,16 +28,16 @@ describe('commander public key placeholder', () => {
     mockGetIdentityFingerprint.mockResolvedValue(null);
   });
 
-  it('exports the expected placeholder constants', () => {
-    expect(COMMANDER_PUBLIC_KEY_B64URL).toBe('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+  it('exports valid base64url placeholder constants', () => {
     expect(COMMANDER_PUBLIC_KEY_PLACEHOLDER).toBe(COMMANDER_PUBLIC_KEY_B64URL);
     expect(COMMANDER_PUBLIC_KEY_B64URL).toHaveLength(43);
+    // v1 demo: prod placeholder intentionally equals dev test key so _example.json verifies on deployed site.
+    expect(COMMANDER_PUBLIC_KEY_B64URL).toBe(DEV_TEST_COMMANDER_PUBLIC_KEY_B64URL);
   });
 
   it('uses the fixed dev test key in dev mode', () => {
     expect(import.meta.env.DEV).toBe(true);
     expect(DEV_TEST_COMMANDER_PUBLIC_KEY_B64URL).toHaveLength(43);
-    expect(DEV_TEST_COMMANDER_PUBLIC_KEY_B64URL).not.toBe(COMMANDER_PUBLIC_KEY_PLACEHOLDER);
     expect(getCommanderPublicKeyBase64Url()).toBe(DEV_TEST_COMMANDER_PUBLIC_KEY_B64URL);
   });
 
