@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -27,14 +27,9 @@ const exampleMission = {
   missionBrief: '深空集合，比較晚到的可以匯合加入遊戲',
 } as const;
 
-const exampleHero = {
-  bytes: new Uint8Array([
-    0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01,
-    0x01, 0x01, 0x00, 0x48, 0x00, 0x48, 0x00, 0x00, 0xff, 0xd9,
-  ]),
-  mimeType: 'image/jpeg',
-  altText: 'Example mission beacon over Crusader',
-} as const;
+const HERO_IMAGE_PATH = 'scripts/assets/hero-image.png';
+const HERO_IMAGE_MIME = 'image/png';
+const HERO_IMAGE_ALT = '奧里森空域集合點';
 
 const exampleMembers = [
   { gameId: 'leadingtw' },
@@ -62,14 +57,16 @@ async function main(): Promise<void> {
       ['sign'],
     );
 
+    const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
+    const heroBytes = new Uint8Array(await readFile(resolve(repoRoot, HERO_IMAGE_PATH)));
+
     const { asset, links } = await encryptMission({
       mission: exampleMission,
-      heroImage: exampleHero,
+      heroImage: { bytes: heroBytes, mimeType: HERO_IMAGE_MIME, altText: HERO_IMAGE_ALT },
       members: [...exampleMembers],
       commanderPrivateKey,
     });
 
-    const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
     const outputPath = resolve(repoRoot, 'public/missions/_example.json');
 
     await mkdir(dirname(outputPath), { recursive: true });
