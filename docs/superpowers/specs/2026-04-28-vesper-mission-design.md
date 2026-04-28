@@ -199,7 +199,7 @@ aadForField = canonicalJSON({
 // 加密 heroImage 時：
 aadForHero = canonicalJSON({
   schemaVersion, cryptoVersion, missionId, fieldName: "heroImage",
-  mimeType, byteLength, params
+  mimeType, byteLength, altText, params
 })
 ```
 
