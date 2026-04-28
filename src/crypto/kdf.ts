@@ -8,9 +8,10 @@ export async function deriveWrapKey(
   salt: Uint8Array,
   iterations: number,
 ): Promise<CryptoKey> {
-  // Copy into plain ArrayBuffer to satisfy SubtleCrypto's strict BufferSource type
-  const keyMaterial: ArrayBuffer = new Uint8Array(utf8Encode(personalKey)).buffer as ArrayBuffer;
-  const saltBuf: ArrayBuffer = new Uint8Array(salt).buffer as ArrayBuffer;
+  // TextEncoder.encode() always returns a fresh, exactly-sized buffer — direct .buffer is safe.
+  const keyMaterial = utf8Encode(personalKey).buffer as ArrayBuffer;
+  // External Uint8Array may be a subview into a larger buffer; copy to enforce exact range.
+  const saltBuf = new Uint8Array(salt).buffer as ArrayBuffer;
 
   const baseKey = await crypto.subtle.importKey(
     'raw',
