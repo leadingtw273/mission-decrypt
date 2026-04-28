@@ -14,7 +14,7 @@ export async function loadAsset(
 ): Promise<LoadResult> {
   let response: Response;
   try {
-    response = await fetch(`/missions/${missionId}.json?v=${SUPPORTED_SCHEMA_VERSION}`);
+    response = await fetch(`${import.meta.env.BASE_URL}missions/${missionId}.json?v=${SUPPORTED_SCHEMA_VERSION}`);
   } catch {
     return { ok: false, reason: 'not_found' };
   }

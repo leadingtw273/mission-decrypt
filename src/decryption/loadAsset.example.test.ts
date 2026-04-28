@@ -14,7 +14,7 @@ describe('loadAsset example fixture', () => {
 
     const result = await loadAsset('_example', await getCommanderPublicKey());
 
-    expect(fetchSpy).toHaveBeenCalledWith('/missions/_example.json?v=1');
+    expect(fetchSpy).toHaveBeenCalledWith(`${import.meta.env.BASE_URL}missions/_example.json?v=1`);
     expect(result).toEqual({ ok: true, asset: exampleAsset });
   });
 });

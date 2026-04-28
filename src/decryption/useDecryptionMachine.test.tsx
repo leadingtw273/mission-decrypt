@@ -74,7 +74,7 @@ describe('useDecryptionMachine', () => {
       expect(result.current.state.kind).toBe('LOCKED');
     });
 
-    expect(fetchSpy).toHaveBeenCalledWith(`/missions/${validAsset.missionId}.json?v=1`);
+    expect(fetchSpy).toHaveBeenCalledWith(`${import.meta.env.BASE_URL}missions/${validAsset.missionId}.json?v=1`);
 
     act(() => {
       result.current.submit('leadingtw', validPersonalKey);

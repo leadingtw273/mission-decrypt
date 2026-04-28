@@ -55,7 +55,7 @@ describe('loadAsset', () => {
 
     const result = await loadAsset(validAsset.missionId, realPublicKey);
 
-    expect(fetchSpy).toHaveBeenCalledWith(`/missions/${validAsset.missionId}.json?v=1`);
+    expect(fetchSpy).toHaveBeenCalledWith(`${import.meta.env.BASE_URL}missions/${validAsset.missionId}.json?v=1`);
     expect(result).toEqual({ ok: true, asset: validAsset });
   });
 
