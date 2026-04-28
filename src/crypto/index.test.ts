@@ -113,7 +113,7 @@ describe('encryptMission + decryptMission round-trip', () => {
     if (!result.ok) expect(result.reason).toBe('forged_asset');
   }, 60_000);
 
-  it('returns invalid_asset for tampered field ciphertext', async () => {
+  it('returns forged_asset when field ciphertext is tampered (signature catches it first)', async () => {
     const { privateKey: cmdPriv, publicKey: cmdPub } = await generateSigningKeypair();
     const { asset, links } = await encryptMission({
       mission: samplePlaintext, heroImage: sampleHero,

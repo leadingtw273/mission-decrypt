@@ -79,8 +79,11 @@ export async function encryptMission(input: {
     fields[fieldName] = { iv: ivKey, ciphertext: toBase64Url(ct) };
   }
 
-  // 4) Encrypt hero image
+  // 4) Encrypt hero image (track heroIv in same Set as field IVs since they share key M)
   const heroIv = crypto.getRandomValues(new Uint8Array(12));
+  const heroIvKey = toBase64Url(heroIv);
+  if (usedIvs.has(heroIvKey)) throw new Error('IV collision in single mission (RNG fault)');
+  usedIvs.add(heroIvKey);
   const heroAad = aadForHero({
     schemaVersion: SCHEMA_VERSION, cryptoVersion: CRYPTO_VERSION,
     missionId, params,
