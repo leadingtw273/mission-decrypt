@@ -3,8 +3,8 @@
   "cryptoVersion": "1",
   "lookupVersion": "1",
   "normalizationVersion": "1",
-  "missionId": "WHN-XFDXT-WA2",
-  "createdAt": "2026-04-28T10:09:04.309Z",
+  "missionId": "VXV-6AW32-ST6",
+  "createdAt": "2026-04-28T12:21:38.246Z",
   "params": {
     "kdf": "PBKDF2-HMAC-SHA256",
     "kdfIterations": 600000,
@@ -18,58 +18,53 @@
     "signature": "Ed25519"
   },
   "wrappedKeys": {
-    "TY7zIA-tCG9_YWZT4SgYf1eNruc1Q8GNog9NdstUkFc": {
-      "salt": "Pp69SrAvdzwEC5Sh0kQTpA",
-      "iv": "FjLU3w-ppLR2bIQy",
-      "wrapped": "vlIjOY2iL3E2Kir6rKQ-9I323ErqjPOqOO6YiKqbsABV4dx1rHKeRPxoqw26EacR"
-    },
-    "Zn02zLK2flp8ZiTP87h12BaTGHMHjJg-tX7mb-XOfDw": {
-      "salt": "C-8l3rPNk2IVcJnRlE7FFw",
-      "iv": "rgL3iv7Y9VRph5M7",
-      "wrapped": "5Mo1cDRG-YK67CQ6xJjv6Sr9E6lajemPvdJoHFLF-hmlY-vfF1jB8anpwhy-vyJx"
+    "fhPZovFvn3UovZ1RjQdKCq5ZL4dYHTUf1_kBLmpDee0": {
+      "salt": "wDz-il4_67Gkb3T-yJ7RaA",
+      "iv": "GhC0snIUOMLO_jJL",
+      "wrapped": "VAE1WAPSFmnNdGpOCWxjya_bodg7P2RPz_cplq9F9ImIPI-6Ku7MjR77HAvfF83j"
     }
   },
   "fields": {
     "missionCommander": {
-      "iv": "hU7Ltggsq6eiDn7b",
-      "ciphertext": "SkeKN0XjZCnkPWUi7mFF788MJ6gXkWJDJoZ9Yqrezgi3yPx9Ul8aMQ"
+      "iv": "XeRKKITFaEa1StuW",
+      "ciphertext": "o_cKjS-LJomE_tewozczbM4YH6HKZVcWGTSDkZUmto4sdZhIzg"
     },
     "communicationChannel": {
-      "iv": "xI8k6a_HV7tK1LhH",
-      "ciphertext": "ANlweIyQo--Fn-Xc8z-Abr-8ylgz1TARuCgOiU-GJ-Apl4ebnn32gJDc8dAkLfY"
+      "iv": "FJ-MM1mrxhLhAeQU",
+      "ciphertext": "Y3doFHvd9gVWI6PVmjh3tJsBpZZSPR7PRq8FgbZ4Cumf1rZ2BdfbWPlMUA"
     },
     "missionTime": {
-      "iv": "TLQrvchJxY7qiwk2",
-      "ciphertext": "u7afWOI2-8zEwGz2ULmjoR9FFdVZ691zscbI8AtxpTbYsjfY0Ak"
+      "iv": "Pwd2BPz4-v_nqCLl",
+      "ciphertext": "Rsq-igJL-kBp2rLyz1PktnpdEOjwmb5zIWBuiJCnPBI_jlD_yQ"
     },
     "rallyTime": {
-      "iv": "h5cxMGlM85TCvZGl",
-      "ciphertext": "IatFO5bgcG9uYq-QVjrP88NlDcsfaBT-E7iGWQP7S8q4Vptp3Zw"
+      "iv": "9NtN9srhOev7w7X9",
+      "ciphertext": "0LAsTuFAuT6ElSkKP3mH-ATZCaMIAWbqZ5SAFik"
     },
     "rallyLocation": {
-      "iv": "OinAH4QouRaMxM3p",
-      "ciphertext": "BDy-a3YCink1zFd1cZmpOJu5X9hjOiMT-3wt9noYoPZjEjyCjXdycNmLHdY"
+      "iv": "P_AlayFXPNrs95VS",
+      "ciphertext": "EH91PvzwJOyeQAUsRUcDZw_NmvraXG0jfHoqGQehyGTlXE5jz18eNCNLfKrGcGhuhJzppw"
     },
     "requiredGear": {
-      "iv": "X5lWrGoU_p9Vsm5L",
-      "ciphertext": "lu8Cd3KKqX_4vuDS7qRcI6u-8tfYcP-ZSNmPF6MDi77h7-SHlmi-RQZeGlb3A6KryccFyyxjz0I-u5JY80Ob"
+      "iv": "9JgpDLQcx7dN1i_2",
+      "ciphertext": "kVagqXouwFRHGauuwWxt6HsQAwaRsc4ddD4NV_kj5mlItff8aJf6rsTxxBfCDgsOOH6UxW75xMrDmAe334Y"
     },
     "accessPermission": {
-      "iv": "neH-Gvy3xMrnXYD8",
-      "ciphertext": "vi4sqyfr63OUiW3PufFS-zCWwB4DZom3H4d9ZxHf_8-8nA"
+      "iv": "jhxKR3AkynOtNc8o",
+      "ciphertext": "j9_JA2B4O49Wpzada_1fGJUBfO2zVI19srIo_F4s7ng47d_jFXmRVRZy5HBn2JTU_KhwATdp05nm-s6QbyZfc9PRrmgcq_OEbtN-9-X7uPAeI2d2k9vZdE3Np_FKOhOICA"
     },
     "rewardDistribution": {
-      "iv": "iL_hUpcGk0uxHAx-",
-      "ciphertext": "UA9HC3gk78gyrtQHUjfntZdtmudMpEbbqXe-_PGIDDowmdHx5tfGTDAUOB0EVuvm9qut"
+      "iv": "RU5RL7_1x5AJml-V",
+      "ciphertext": "m74YSWqc-fWXTuSmP7iq1HRlJygDCTwh3dZXl6J7UbrtL3awdkyWAOboYA"
     },
     "missionBrief": {
-      "iv": "6SFd-N39Hh4BV4nL",
-      "ciphertext": "VrJ7l9f7OHP8Ev0dnNKLGAIh1LRNd0KcCxcoIrcIaSzWdMQX8D7AS_9sTyBp7hC5qOL1W5MzPbmGaYwiAdMWDWZN_y7Ebki_Hwq0VBI-1nZlQNOqJhhXw19Wde4Yz0wuUDj2uwTi"
+      "iv": "4FtL87ABgJerH7cn",
+      "ciphertext": "ln7SHu7tJpDiOw4lWUqV5sl9rH41gvAWF9xr58biZwlm-a8P2olC9l7IRNszgBKlPh7TzRTx9TqeUWjv5aMJa_4A48rPPw"
     }
   },
   "heroImage": {
-    "iv": "5RhXn_LnwQejcBiU",
-    "ciphertext": "AoYhTXUxXntLFckphpaNPCZK9_Bgb1QXJc_YlfB42wSNn9vZ26U",
+    "iv": "F-IDYWrManWhzOXg",
+    "ciphertext": "xEESiNDp0pAtjUEq-hyI2Dd2DA-PM19t8GtRboxNgNXIGO4jyW4",
     "metadata": {
       "mimeType": "image/jpeg",
       "byteLength": 22,
@@ -79,6 +74,6 @@
   "signature": {
     "alg": "Ed25519",
     "publicKeyFingerprint": "Kq2oFVErhzzV7Q2PCeLQ0g",
-    "value": "57BPYJuaaLewvk38kV0tZsUsyhVoxuuU6h8s3htuUb_4Rdrjcb1eckAHbOeeoSa9YozmfkfUQnKQNeiBS4MdDw"
+    "value": "aOc43uZrY61Re-BsxvnXAm_nhq0mDFU7yzHGS-l1R3dk0dbJA5ABmHa23u3UjNeeFe50Ne_PBqVwQdsPV5n3Cw"
   }
 }

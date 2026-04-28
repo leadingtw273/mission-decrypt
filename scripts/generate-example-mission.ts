@@ -16,15 +16,15 @@ const DEV_TEST_COMMANDER_PRIVATE_JWK: JsonWebKey = {
 };
 
 const exampleMission = {
-  missionCommander: 'Cmdr. Vesper [leadingtw]',
-  communicationChannel: 'Squadron Command / Vesper Relay',
-  missionTime: '2026-05-01 22:00 GMT+8',
-  rallyTime: '2026-05-01 21:30 GMT+8',
-  rallyLocation: 'Orison - Providence Platform',
-  requiredGear: 'Light fighter or dropship, medpen, tractor beam',
-  accessPermission: 'Whitelisted pilots',
-  rewardDistribution: 'Equal split after operational costs',
-  missionBrief: 'Launch from Orison, secure relay beacon, then escort recovery team back to atmosphere.',
+  missionCommander: '老周【leadingtw】',
+  communicationChannel: '戰略頻道 > 星際遨遊',
+  missionTime: '21:00 - 23:00 (GMT+8)',
+  rallyTime: '20:30 (GMT+8)',
+  rallyLocation: '奧里森空域，進入隊伍跳點',
+  requiredGear: '隨意，自身主武器彈藥備足(約40匣)',
+  accessPermission: '所有人，若有阿波蘿，請開阿波蘿與備好隊伍凝膠到指定地點',
+  rewardDistribution: '酣暢淋漓的槍戰體驗',
+  missionBrief: '深空集合，比較晚到的可以匯合加入遊戲',
 } as const;
 
 const exampleHero = {
@@ -38,7 +38,6 @@ const exampleHero = {
 
 const exampleMembers = [
   { gameId: 'leadingtw' },
-  { gameId: 'vesper_test' },
 ] as const;
 
 async function main(): Promise<void> {
