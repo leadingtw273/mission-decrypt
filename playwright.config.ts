@@ -5,12 +5,12 @@ export default defineConfig({
   fullyParallel: true,
   retries: 0,
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:5180',
     trace: 'retain-on-failure',
   },
   webServer: {
-    command: 'pnpm dev',
-    url: 'http://localhost:5173',
+    command: 'pnpm dev --port 5180 --strictPort',
+    url: 'http://localhost:5180',
     reuseExistingServer: !process.env.CI,
   },
   projects: [
