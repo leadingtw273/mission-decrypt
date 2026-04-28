@@ -165,8 +165,9 @@ describe('decryption state reducer', () => {
       personalKey: 'ABCD-EFGH-JKMN-PQR0',
     };
 
-    expect(reducer(state, { type: 'DECRYPT_OK', mission: sampleMission, heroImage: sampleHeroImage })).toEqual({
+    expect(reducer(state, { type: 'DECRYPT_OK', asset: sampleAsset, mission: sampleMission, heroImage: sampleHeroImage })).toEqual({
       kind: 'DECRYPTED',
+      asset: sampleAsset,
       mission: sampleMission,
       heroImage: sampleHeroImage,
     });
@@ -251,6 +252,7 @@ describe('decryption state reducer', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const state: State = {
       kind: 'DECRYPTED',
+      asset: sampleAsset,
       mission: sampleMission,
       heroImage: sampleHeroImage,
     };

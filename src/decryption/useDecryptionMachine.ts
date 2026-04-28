@@ -75,6 +75,7 @@ export function useDecryptionMachine(missionId: string | null): {
       if (result.ok) {
         dispatch({
           type: 'DECRYPT_OK',
+          asset,
           mission: result.mission,
           heroImage: result.heroImage,
         });

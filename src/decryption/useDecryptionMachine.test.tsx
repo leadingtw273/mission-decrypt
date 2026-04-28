@@ -86,6 +86,7 @@ describe('useDecryptionMachine', () => {
 
     expect(result.current.state).toEqual({
       kind: 'DECRYPTED',
+      asset: validAsset,
       mission: sampleMission,
       heroImage: {
         mimeType: sampleHero.mimeType,

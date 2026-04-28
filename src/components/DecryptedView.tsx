@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 
-import type { MissionPlaintext } from '../crypto';
+import type { MissionAssetV1, MissionPlaintext } from '../crypto';
 import type { FieldName } from '../crypto/schema';
+import { AnimatedCipherText } from './shared/AnimatedCipherText';
 import { FrameBracket } from './shared/FrameBracket';
 
 type DecryptedViewProps = {
+  asset: MissionAssetV1;
   mission: MissionPlaintext;
   heroImage: {
     mimeType: string;
@@ -25,7 +27,7 @@ const FIELD_SPECS: Array<{ name: FieldName; label: string }> = [
   { name: 'missionBrief', label: 'MISSION BRIEF' },
 ];
 
-export function DecryptedView({ mission, heroImage }: DecryptedViewProps) {
+export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps) {
   const [heroImageUrl, setHeroImageUrl] = useState('');
 
   useEffect(() => {
@@ -66,7 +68,11 @@ export function DecryptedView({ mission, heroImage }: DecryptedViewProps) {
             <div key={field.name} className="border border-border bg-bg-primary/55 px-4 py-3">
               <p className="font-label text-[11px] text-text/70">{field.label}</p>
               <p className="font-body mt-2 whitespace-pre-wrap text-sm text-primary">
-                {mission[field.name]}
+                <AnimatedCipherText
+                  mode="scramble-reveal"
+                  sourceText={asset.fields[field.name].ciphertext}
+                  text={mission[field.name]}
+                />
               </p>
             </div>
           ))}

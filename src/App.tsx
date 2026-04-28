@@ -40,7 +40,7 @@ function renderStateView(
     case 'DECRYPTING':
       return <DecryptingView />;
     case 'DECRYPTED':
-      return <DecryptedView mission={state.mission} heroImage={state.heroImage} />;
+      return <DecryptedView asset={state.asset} mission={state.mission} heroImage={state.heroImage} />;
     case 'ERROR':
       return state.retryable ? (
         <ErrorView reason={state.reason} retryable={state.retryable} onRetry={retry} />

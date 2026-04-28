@@ -1,6 +1,9 @@
+import { motion } from 'framer-motion';
+
 import type { DecryptErrorReason } from '../crypto';
 import { Button } from './shared/Button';
 import { FrameBracket } from './shared/FrameBracket';
+import { usePrefersReducedMotion } from './shared/usePrefersReducedMotion';
 
 type ErrorViewProps = {
   reason: DecryptErrorReason;
@@ -22,13 +25,35 @@ const ERROR_MESSAGES: Record<DecryptErrorReason, string> = {
 
 export function ErrorView({ reason, retryable, onRetry }: ErrorViewProps) {
   const isForgedAsset = reason === 'forged_asset';
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
-    <section
+    <motion.section
+      animate={
+        prefersReducedMotion
+          ? { x: 0, boxShadow: '0 0 40px rgba(229,72,77,0.12)' }
+          : {
+              x: [0, -12, 12, -8, 8, 0],
+              boxShadow: [
+                '0 0 40px rgba(229,72,77,0.12)',
+                '0 0 52px rgba(229,72,77,0.3)',
+                '0 0 40px rgba(229,72,77,0.12)',
+              ],
+            }
+      }
       aria-live="assertive"
-      className="border border-border bg-bg-secondary/60 px-6 py-8 shadow-[0_0_40px_rgba(229,72,77,0.12)] md:px-8"
+      className="relative overflow-hidden border border-border bg-bg-secondary/60 px-6 py-8 shadow-[0_0_40px_rgba(229,72,77,0.12)] md:px-8"
+      initial={prefersReducedMotion ? false : { x: 0, boxShadow: '0 0 40px rgba(229,72,77,0.12)' }}
       role="alert"
+      transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3, ease: 'easeInOut' }}
     >
+      <motion.div
+        animate={prefersReducedMotion ? { opacity: 0 } : { opacity: [0, 0.22, 0] }}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-danger/18"
+        initial={prefersReducedMotion ? false : { opacity: 0 }}
+        transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3, ease: 'easeInOut' }}
+      />
       <div className="flex min-h-[24rem] flex-col items-center justify-center gap-6 text-center">
         <FrameBracket
           size={26}
@@ -56,7 +81,7 @@ export function ErrorView({ reason, retryable, onRetry }: ErrorViewProps) {
           </Button>
         ) : null}
       </div>
-    </section>
+    </motion.section>
   );
 }
 

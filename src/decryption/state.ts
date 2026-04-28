@@ -11,7 +11,7 @@ export type State =
   | { kind: 'ASSET_LOADING'; missionId: string }
   | { kind: 'LOCKED'; missionId: string; asset: MissionAssetV1 }
   | { kind: 'DECRYPTING'; missionId: string; asset: MissionAssetV1; gameId: string; personalKey: string }
-  | { kind: 'DECRYPTED'; mission: MissionPlaintext; heroImage: DecryptedHeroImage }
+  | { kind: 'DECRYPTED'; asset: MissionAssetV1; mission: MissionPlaintext; heroImage: DecryptedHeroImage }
   | { kind: 'ERROR'; reason: DecryptErrorReason; retryable: boolean; lastAsset?: MissionAssetV1 };
 
 type AssetFailedReason = 'not_found' | 'invalid_asset' | 'forged_asset' | 'unsupported_version';
@@ -23,7 +23,7 @@ export type Action =
   | { type: 'ASSET_LOADED'; asset: MissionAssetV1 }
   | { type: 'ASSET_FAILED'; reason: AssetFailedReason }
   | { type: 'SUBMIT'; gameId: string; personalKey: string }
-  | { type: 'DECRYPT_OK'; mission: MissionPlaintext; heroImage: DecryptedHeroImage }
+  | { type: 'DECRYPT_OK'; asset: MissionAssetV1; mission: MissionPlaintext; heroImage: DecryptedHeroImage }
   | { type: 'DECRYPT_FAIL'; reason: DecryptFailReason }
   | { type: 'RETRY' };
 
@@ -69,6 +69,7 @@ export function reducer(state: State, action: Action): State {
       if (action.type === 'DECRYPT_OK') {
         return {
           kind: 'DECRYPTED',
+          asset: action.asset,
           mission: action.mission,
           heroImage: action.heroImage,
         };

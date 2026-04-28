@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { MissionAssetV1, MissionPlaintext } from '../crypto';
 import { DecryptedView } from './DecryptedView';
@@ -93,8 +93,31 @@ function mockObjectUrlApis() {
   return { createObjectURL, revokeObjectURL };
 }
 
+function mockReducedMotionPreference(matches: boolean) {
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    writable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: query === '(prefers-reduced-motion: reduce)' ? matches : false,
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+}
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
 describe('LockedView', () => {
   it('renders mission field labels and ciphertext gibberish', () => {
+    mockReducedMotionPreference(true);
+
     render(<LockedView asset={sampleAsset} onSubmit={vi.fn()} submitting={false} />);
 
     expect(screen.getByText('MISSION COMMANDER')).toHaveClass('font-label');
@@ -142,39 +165,49 @@ describe('DecryptingView', () => {
 
     expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite');
   });
+
+  it('skips motion effects when prefers-reduced-motion is enabled', () => {
+    mockReducedMotionPreference(true);
+
+    render(<DecryptingView />);
+
+    expect(screen.getByText('DECRYPTING...')).toHaveAttribute('data-motion', 'reduced');
+  });
 });
 
 describe('DecryptedView', () => {
   it('renders all 9 mission fields with real values', () => {
+    mockReducedMotionPreference(true);
     mockObjectUrlApis();
 
-    render(<DecryptedView heroImage={sampleHeroImage} mission={sampleMission} />);
+    render(<DecryptedView asset={sampleAsset} heroImage={sampleHeroImage} mission={sampleMission} />);
 
     expect(screen.getByText('MISSION COMMANDER')).toHaveClass('font-label');
-    expect(screen.getByText(sampleMission.missionCommander)).toHaveClass('font-body');
+    expect(screen.getByText(sampleMission.missionCommander).parentElement).toHaveClass('font-body');
     expect(screen.getByText('COMMUNICATION CHANNEL')).toHaveClass('font-label');
-    expect(screen.getByText(sampleMission.communicationChannel)).toHaveClass('font-body');
+    expect(screen.getByText(sampleMission.communicationChannel).parentElement).toHaveClass('font-body');
     expect(screen.getByText('MISSION TIME')).toHaveClass('font-label');
-    expect(screen.getByText(sampleMission.missionTime)).toHaveClass('font-body');
+    expect(screen.getByText(sampleMission.missionTime).parentElement).toHaveClass('font-body');
     expect(screen.getByText('RALLY TIME')).toHaveClass('font-label');
-    expect(screen.getByText(sampleMission.rallyTime)).toHaveClass('font-body');
+    expect(screen.getByText(sampleMission.rallyTime).parentElement).toHaveClass('font-body');
     expect(screen.getByText('RALLY LOCATION')).toHaveClass('font-label');
-    expect(screen.getByText(sampleMission.rallyLocation)).toHaveClass('font-body');
+    expect(screen.getByText(sampleMission.rallyLocation).parentElement).toHaveClass('font-body');
     expect(screen.getByText('REQUIRED GEAR')).toHaveClass('font-label');
-    expect(screen.getByText(sampleMission.requiredGear)).toHaveClass('font-body');
+    expect(screen.getByText(sampleMission.requiredGear).parentElement).toHaveClass('font-body');
     expect(screen.getByText('ACCESS PERMISSION')).toHaveClass('font-label');
-    expect(screen.getByText(sampleMission.accessPermission)).toHaveClass('font-body');
+    expect(screen.getByText(sampleMission.accessPermission).parentElement).toHaveClass('font-body');
     expect(screen.getByText('REWARD DISTRIBUTION')).toHaveClass('font-label');
-    expect(screen.getByText(sampleMission.rewardDistribution)).toHaveClass('font-body');
+    expect(screen.getByText(sampleMission.rewardDistribution).parentElement).toHaveClass('font-body');
     expect(screen.getByText('MISSION BRIEF')).toHaveClass('font-label');
-    expect(screen.getByText(sampleMission.missionBrief)).toHaveClass('font-body');
+    expect(screen.getByText(sampleMission.missionBrief).parentElement).toHaveClass('font-body');
     expect(screen.getByRole('img', { name: sampleHeroImage.altText })).toHaveAttribute('src', 'blob:mission-hero');
   });
 
   it('creates and revokes object URL for hero image', () => {
+    mockReducedMotionPreference(true);
     const { createObjectURL, revokeObjectURL } = mockObjectUrlApis();
 
-    const { unmount } = render(<DecryptedView heroImage={sampleHeroImage} mission={sampleMission} />);
+    const { unmount } = render(<DecryptedView asset={sampleAsset} heroImage={sampleHeroImage} mission={sampleMission} />);
     const blobArg = createObjectURL.mock.calls.at(0)?.[0];
 
     expect(createObjectURL).toHaveBeenCalledTimes(1);
