@@ -402,20 +402,58 @@ window.fleetOps = {
 
 ## 7. 視覺與動畫
 
-- **Tailwind v4** + 自定 theme（顏色、字體、邊框圓角全 token 化）
-- **字體 self-host** Orbitron + Inter（避免 Google Fonts 連線拖慢，且離線可用）
-- **Framer Motion**：
-  - `BOOTSTRAPPING` → `ASSET_LOADING`：橘色掃描線
-  - `ASSET_LOADING` → `LOCKED`：典型「terminal load」逐字浮現密文 gibberish
-  - `LOCKED` → `DECRYPTING`：lock icon 旋轉、密文 scramble 加速
-  - `DECRYPTING` → `DECRYPTED`：每欄位 typewriter 從密文逐字「解碼」成 plaintext
-  - `ERROR`：紅色閃爍 + horizontal shake（300ms）
-- **a11y**：
-  - 所有動畫尊重 `prefers-reduced-motion`，降為 instant transition
-  - 失敗訊息為 ARIA live region (`role="alert"`)
-  - 鍵盤可完整操作（focus trap in modal、tab order 合理）
-  - hero image：`heroImage.metadata.altText`（authoring modal 的可選欄位，未填預設 "Mission rally point"）解密後填入 `<img alt={altText}>`
-  - 對比度檢查：所有橘色文字在黑底達 WCAG AA
+### 7.1 設計 Tokens（Tailwind v4）
+
+| Token | 值 | 用途 |
+|---|---|---|
+| `--color-primary` | `#FFBA00` | 主橘 — 標題裝飾線、primary button、active state、orange icons |
+| `--color-secondary` | `#E0C27A` | 次橘金 — 強調文字、checkmark fill |
+| `--color-bg-primary` | `#0E1116` | 全局背景 |
+| `--color-bg-secondary` | `#161B22` | Panel 內層背景 |
+| `--color-border` | `#2A313C` | 邊框 / divider |
+| `--color-text` | `#A3ADB8` | 主要正文 |
+| `--color-danger` | `#E5484D` | 失敗紅 — `forged_asset` / `auth_failed` UI 警示（本色不在原 style guide 標籤中，視為功能性必要新增） |
+| `--font-display` | `Orbitron` | 標題、狀態文字、UI 標註、Mission ID |
+| `--font-body` | `Inter` | 正文、欄位 value |
+| `--tracking-display` | `0.18em` | Orbitron 標題字距（廣播 HUD 感） |
+| `--tracking-label` | `0.12em` | Orbitron 小標、UI label |
+
+### 7.2 標誌性視覺元素
+
+- **L 形取景框 (Frame Brackets)**：Panel 四角、Lock icon 包圍框、Hero 圖區四角都帶 L 型細線（1.5px、長 16-24px）。Tailwind 透過自訂 `frame-bracket` utility 或單獨 React 元件實作（內含 4 個絕對定位 SVG `<path>`）
+- **裝飾分隔線**：虛線中央帶點 (`──•──`)，而非實線
+- **Stencil-cut Icons**：所有 line icon 線條粗細 1.5–2px，轉角銳利且部分轉角故意留 1-2px 斷點（鋼印質感）
+- **Input 左側 2px 垂直 accent bar**：active 時變橘、disabled 時保持深灰
+- **亂碼字符集**：限制在 `% $ @ ! # ^ & * ( ) _ + [ ] { } ; ' \" < > ? / ~` 範圍內（避免字母混入導致誤讀為英文），保留視覺一致性
+
+### 7.3 字體載入
+
+self-host Orbitron + Inter，避免 Google Fonts 連線拖慢且離線可用。Variable woff2 各取一份。
+
+### 7.4 動畫（Framer Motion）
+
+| 階段 | 動畫 |
+|---|---|
+| `BOOTSTRAPPING` → `ASSET_LOADING` | 橘色 scanner sweep（橫向發光線從頂部往下 800ms loop） |
+| `ASSET_LOADING` 期間 | scanner sweep 持續循環；Panel 內顯示 `LOADING TRANSMISSION...` |
+| `ASSET_LOADING` → `LOCKED` | 密文 gibberish per field 逐字浮現（每字符 ~10ms） |
+| `LOCKED` → `DECRYPTING` | Lock icon 旋轉 360°、密文 scramble 加速、scanner sweep 切換為 cyan 變體（仍用 primary 橘但加 box-shadow glow） |
+| `DECRYPTING` 期間 | per-field 文字快速 character randomizer（500ms 內滾動切換為 plaintext） |
+| `DECRYPTING` → `DECRYPTED` | typewriter 收尾，每欄位逐字定格；Lock icon 變為 checkmark + L 形框 pulse 一次 |
+| `DECRYPTED` | 靜止狀態，無持續動畫 |
+| `ERROR` | 紅色 (`--color-danger`) horizontal shake 300ms + 字體輕微 RGB split chromatic aberration（enhancement，可後期加） |
+
+進度指示用 **Segmented Progress Bar**（10 個小矩形組成，逐個填滿，呼應 mockup 細節），而非平滑漸變。
+
+### 7.5 a11y
+
+- 所有動畫尊重 `prefers-reduced-motion: reduce`（CSS 媒體查詢直接降為 instant；scanner sweep / scramble / shake 全停）
+- 失敗訊息為 ARIA live region (`role="alert" aria-live="assertive"`)
+- 鍵盤可完整操作（modal focus trap、tab order 合理、Escape 關閉 modal）
+- 主要操作元素 (`Submit`、`Generate`、`Retry`) `aria-label` 完整
+- hero image：`heroImage.metadata.altText` 解密後填入 `<img alt={altText}>`，未填預設 "Mission rally point"
+- 對比度檢查：所有橘色文字在黑底達 WCAG AA（`#FFBA00` on `#0E1116` 對比度 ≈ 11.4:1，遠超 AA 4.5:1）
+- 紅色錯誤文字 `#E5484D` on `#0E1116` 對比度 ≈ 5.3:1，達 AA
 
 ## 8. 測試策略
 

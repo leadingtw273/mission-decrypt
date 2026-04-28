@@ -338,6 +338,25 @@ Expected: file ~ 80-130 KB.
 
   --font-display: "Orbitron", system-ui, sans-serif;
   --font-body: "Inter", system-ui, sans-serif;
+
+  /* Letter-spacing tokens for HUD/broadcast feel */
+  --tracking-display: 0.18em;  /* Orbitron headings */
+  --tracking-label: 0.12em;    /* Orbitron UI labels */
+}
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: var(--tracking-display);
+}
+
+.font-label {
+  font-family: var(--font-display);
+  letter-spacing: var(--tracking-label);
+  font-weight: 500;
+}
+
+.font-body {
+  font-family: var(--font-body);
 }
 
 html, body, #root {
