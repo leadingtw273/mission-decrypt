@@ -80,6 +80,25 @@ const sampleImage: PickedImage = {
   altText: 'Night approach',
 };
 
+function installDownloadMocks() {
+  const createObjectURL = vi.fn<(obj: Blob) => string>(() => 'blob:mission');
+  const revokeObjectURL = vi.fn<(url: string) => void>();
+  const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+
+  Object.defineProperty(URL, 'createObjectURL', {
+    configurable: true,
+    writable: true,
+    value: createObjectURL,
+  });
+  Object.defineProperty(URL, 'revokeObjectURL', {
+    configurable: true,
+    writable: true,
+    value: revokeObjectURL,
+  });
+
+  return { createObjectURL, revokeObjectURL, clickSpy };
+}
+
 afterEach(() => {
   vi.restoreAllMocks();
 });
@@ -139,6 +158,7 @@ describe('AuthoringModal', () => {
     const user = userEvent.setup();
     const onGenerate = vi.fn().mockResolvedValue(sampleResult);
     mockedPickImage.mockResolvedValue(sampleImage);
+    installDownloadMocks();
 
     render(
       <AuthoringModal
@@ -184,6 +204,8 @@ describe('AuthoringModal', () => {
       members: [{ gameId: 'pilot7' }, { gameId: 'ace42' }],
       identity: { privateKey: sampleIdentity.privateKey },
     });
+    expect(screen.getByText('Mission generated successfully')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Done' })).toBeInTheDocument();
   });
 
   it('closes on Escape when the form is pristine', async () => {

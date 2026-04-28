@@ -12,6 +12,7 @@ import { createPortal } from 'react-dom';
 import type { GenerateMissionInput, GenerateMissionResult } from './generateMission';
 import type { CommanderIdentity } from './identity';
 import { pickImage, type PickedImage } from './pickImage';
+import { PostGenerationView } from './PostGenerationView';
 import { Button } from '../components/shared/Button';
 import { FrameBracket } from '../components/shared/FrameBracket';
 import { Input } from '../components/shared/Input';
@@ -288,7 +289,7 @@ export function AuthoringModal({
             ) : null}
 
             {phase === 'post-generation' ? (
-              <PostGenerationPlaceholder result={generatedResult} />
+              generatedResult ? <PostGenerationView result={generatedResult} onClose={onClose} /> : null
             ) : null}
           </section>
         </FrameBracket>
@@ -522,17 +523,6 @@ function MemberFieldRow(props: {
           Remove
         </Button>
       ) : null}
-    </div>
-  );
-}
-
-function PostGenerationPlaceholder({ result }: { result: GenerateMissionResult | null }) {
-  return (
-    <div className="space-y-4">
-      <p className="font-label text-sm uppercase tracking-[0.22em] text-primary">Post-generation</p>
-      <p className="font-body text-sm text-text/75">
-        Mission {result?.missionId ?? 'unknown'} generated. Full post-generation delivery UI lands in Task 3.4.
-      </p>
     </div>
   );
 }
