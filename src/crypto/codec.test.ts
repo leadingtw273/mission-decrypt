@@ -81,4 +81,12 @@ describe('hmacSha256', () => {
     const b = await hmacSha256(new TextEncoder().encode('k2'), new TextEncoder().encode('m'));
     expect(a).not.toEqual(b);
   });
+
+  it('matches RFC 4231 test case 1 (HMAC-SHA-256 KAT)', async () => {
+    const key = new Uint8Array(20).fill(0x0b);
+    const msg = new TextEncoder().encode('Hi There');
+    const out = await hmacSha256(key, msg);
+    const hex = Array.from(out).map(b => b.toString(16).padStart(2, '0')).join('');
+    expect(hex).toBe('b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7');
+  });
 });
