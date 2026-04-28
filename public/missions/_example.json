@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "1",
+  "cryptoVersion": "1",
+  "lookupVersion": "1",
+  "normalizationVersion": "1",
+  "missionId": "ANB-1T4OM-QR1",
+  "createdAt": "2026-04-28T09:28:21.680Z",
+  "params": {
+    "kdf": "PBKDF2-HMAC-SHA256",
+    "kdfIterations": 600000,
+    "kdfHash": "SHA-256",
+    "derivedKeyLength": 32,
+    "saltLength": 16,
+    "cipher": "AES-256-GCM",
+    "ivLength": 12,
+    "gcmTagLength": 16,
+    "encoding": "base64url",
+    "signature": "Ed25519"
+  },
+  "wrappedKeys": {
+    "zH37AQDPGcbIf2ux1u9XZ7vJvZZHqZYBWTX33ZPaqzw": {
+      "salt": "WEAFrHDvedFC7jSixsBZXQ",
+      "iv": "dkTBtGWNVMBmaHdr",
+      "wrapped": "g3f6J1D7Fvf76I4ITpwCOmxegg0qPZfotkUQU1vAJUknOAD-Dc1eIjTcQlMKbF6P"
+    },
+    "GP7mox6R3aeVzTYeVnPzHBn6RjUM1zyre_aDyw4Ab-c": {
+      "salt": "Jt1dJlnPw-WmeIe3aAhxJA",
+      "iv": "U58432eqPDdrfV4e",
+      "wrapped": "qwnMft9DDIHifNNgKFh5wsYOYEFkA32BjWJ5ImjOddfegJvXSmMtwHImeA74-oE3"
+    }
+  },
+  "fields": {
+    "missionCommander": {
+      "iv": "nhr2G7BH0-g-Tjd6",
+      "ciphertext": "7MU1yh1Rqsps26FRgdkQyDaJHIhZKBctbJb4vxyknR0b-iXzBrNuQw"
+    },
+    "communicationChannel": {
+      "iv": "Buazu3abeQpAsih8",
+      "ciphertext": "-8HP-sK8YEKlMLOKjZKwvOTDRIyVDSayF0shlsfKk-A4zsK2hMo7zqjyPJAeguk"
+    },
+    "missionTime": {
+      "iv": "kLMHbQnPh6CjFrlG",
+      "ciphertext": "IZb421SYGVGBl1z-DEjXnFr5rizzjWPvS8J9ERUOWT8q13tnf0A"
+    },
+    "rallyTime": {
+      "iv": "Qg9lrw0dluX6x86T",
+      "ciphertext": "d-mBM-o7RC88XOZnjJrdHrDdUsnZndbBzHLDuN8kTWPDa8B-_UU"
+    },
+    "rallyLocation": {
+      "iv": "jDwOCBySSQ4S0Vdz",
+      "ciphertext": "CPJuWOvymH-n8QEAYo2c5hrSXIy-D4aKxsdk5-jceP1lUnJrnHlXg217iL0"
+    },
+    "requiredGear": {
+      "iv": "AF3d_5Thuec8aIMh",
+      "ciphertext": "vTtym1tsIWHKdSHVBoh0k_V149TMJ4SgpCVADg1n2ESaukf-yjIzgqv5dnj7IpGO0x77voMu2dsFwA_NLdZ-"
+    },
+    "accessPermission": {
+      "iv": "-eYhh0Ylljj_M0iY",
+      "ciphertext": "t5_sJe4WLzRfr_0DCogSu7-xnH5-cBdT-yqGh0evdxqC5g"
+    },
+    "rewardDistribution": {
+      "iv": "njcmXnmacqnSjlRL",
+      "ciphertext": "j-qp_KTwMwS4j1JUJPM3a-SEjdrPcPLItiYIRIIfVd41ACwzge-OvzXiEXtwLnOhewaL"
+    },
+    "missionBrief": {
+      "iv": "T3sg8JAl3mEo2COZ",
+      "ciphertext": "VEwjlnoV9vZdZ2ljO5hjjN8Mfs42HdUo7rva8_b2LwY0T_rmcxPNBxfLUtWcUdQ1z5NgzajRPRoNm6WtAQ0DK8cGa3zy2Qnbsi87_p4uwrACNYvNBQ0jwnhlocDO2iHWqAs4J7do"
+    }
+  },
+  "heroImage": {
+    "iv": "r_isCqQddEgZOUJi",
+    "ciphertext": "rv1mK6Uc01ippkr64CcA1amLvEfN20iyHF4_Q95DkLxvQrcG5Ak",
+    "metadata": {
+      "mimeType": "image/jpeg",
+      "byteLength": 22,
+      "altText": "Example mission beacon over Crusader"
+    }
+  },
+  "signature": {
+    "alg": "Ed25519",
+    "publicKeyFingerprint": "Kq2oFVErhzzV7Q2PCeLQ0g",
+    "value": "_uj04dLRLCuRKlkQHj_4PwycuG13tcaKmL8ICWp0b8sHK5IIQilqlfXMtVOcy4UAnf7Lk-SOopwPvsMXczMtAA"
+  }
+}
