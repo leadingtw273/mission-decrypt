@@ -99,6 +99,7 @@ export { normalizeGameId } from './normalization';
 - Create: `tsconfig.json`
 - Create: `tsconfig.node.json`
 - Create: `vite.config.ts`
+- Create: `vitest.config.ts`
 - Create: `index.html`
 - Create: `src/main.tsx`
 - Create: `src/App.tsx`
@@ -143,7 +144,6 @@ strict-peer-dependencies=false
     "typescript": "^5.6.3",
     "vite": "^6.0.0",
     "vitest": "^2.1.5",
-    "@vitest/browser": "^2.1.5",
     "happy-dom": "^15.11.0"
   }
 }
@@ -203,11 +203,11 @@ coverage
     "allowSyntheticDefaultImports": true,
     "strict": true
   },
-  "include": ["vite.config.ts", "playwright.config.ts"]
+  "include": ["vite.config.ts", "vitest.config.ts", "playwright.config.ts"]
 }
 ```
 
-- [ ] **Step 6: Write `vite.config.ts`**
+- [ ] **Step 6a: Write `vite.config.ts`**
 
 ```ts
 import { defineConfig } from 'vite';
@@ -216,13 +216,27 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  test: {
-    globals: true,
-    environment: 'happy-dom',
-    setupFiles: [],
-    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
-  },
 });
+```
+
+- [ ] **Step 6b: Write `vitest.config.ts`**
+
+> Split-config pattern: vite stays on its own `defineConfig`, vitest layers over it via `mergeConfig`. Avoids vite@5 ↔ vite@6 type mismatch from vitest's transitive deps when both `test` and vite plugins live in the same file.
+
+```ts
+import { defineConfig, mergeConfig } from 'vitest/config';
+import viteConfig from './vite.config';
+
+export default mergeConfig(
+  viteConfig,
+  defineConfig({
+    test: {
+      globals: true,
+      environment: 'happy-dom',
+      include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    },
+  }),
+);
 ```
 
 - [ ] **Step 7: Write `index.html`**
@@ -278,7 +292,7 @@ Expected: dependencies installed without errors.
 - [ ] **Step 11: Commit**
 
 ```bash
-git add package.json pnpm-lock.yaml .npmrc .gitignore tsconfig.json tsconfig.node.json vite.config.ts index.html src/main.tsx src/App.tsx
+git add package.json pnpm-lock.yaml .npmrc .gitignore tsconfig.json tsconfig.node.json vite.config.ts vitest.config.ts index.html src/main.tsx src/App.tsx
 git commit -m "chore: scaffold Vite + React + TS + Tailwind v4 + Vitest"
 ```
 
