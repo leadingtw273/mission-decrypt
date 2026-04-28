@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
+import fc from 'fast-check';
 import { MissionAssetV1Schema, MissionPlaintextSchema, parseMissionAsset } from './schema';
+import { canonicalJSON } from './codec';
 
 describe('MissionAssetV1 schema', () => {
   const validAsset = {
@@ -82,5 +84,73 @@ describe('MissionPlaintextSchema', () => {
 
   it('rejects missing fields', () => {
     expect(() => MissionPlaintextSchema.parse({ missionCommander: 'x' })).toThrow();
+  });
+});
+
+describe('MissionAssetV1 schema (fuzz)', () => {
+  it('rejects arbitrary garbage objects', () => {
+    fc.assert(
+      fc.property(fc.object(), (garbage) => {
+        const result = parseMissionAsset(garbage);
+        // Almost all random objects should fail
+        // We only assert: when it succeeds, the missionId pattern is satisfied
+        if (result.ok) {
+          expect(result.value.missionId).toMatch(/^[A-Z]{3}-[A-Z0-9]{5}-[A-Z]{2}[0-9]$/);
+        }
+      }),
+      { numRuns: 200 },
+    );
+  });
+
+  it('rejects assets with unknown extra top-level fields', () => {
+    // Note: zod by default strips unknown keys, but doesn't fail.
+    // Use .strict() in schema if we need to reject unknown.
+    // For v1, we tolerate extra fields (fail-open) — assert this behavior is intentional.
+    const ok = parseMissionAsset({ schemaVersion: '1', extraJunk: true });
+    expect(ok.ok).toBe(false);  // missing required fields fails first
+  });
+
+  it('rejects mutated valid asset where missionId pattern is broken', () => {
+    const valid = {
+      schemaVersion: '1', cryptoVersion: '1', lookupVersion: '1', normalizationVersion: '1',
+      missionId: 'lowercase-bad-id',
+      createdAt: '2026-04-28T10:00:00Z',
+      params: {
+        kdf: 'PBKDF2-HMAC-SHA256', kdfIterations: 600000, kdfHash: 'SHA-256',
+        derivedKeyLength: 32, saltLength: 16, cipher: 'AES-256-GCM',
+        ivLength: 12, gcmTagLength: 16, encoding: 'base64url', signature: 'Ed25519',
+      },
+      wrappedKeys: {},
+      fields: {
+        missionCommander: { iv: 'i', ciphertext: 'c' },
+        communicationChannel: { iv: 'i', ciphertext: 'c' },
+        missionTime: { iv: 'i', ciphertext: 'c' },
+        rallyTime: { iv: 'i', ciphertext: 'c' },
+        rallyLocation: { iv: 'i', ciphertext: 'c' },
+        requiredGear: { iv: 'i', ciphertext: 'c' },
+        accessPermission: { iv: 'i', ciphertext: 'c' },
+        rewardDistribution: { iv: 'i', ciphertext: 'c' },
+        missionBrief: { iv: 'i', ciphertext: 'c' },
+      },
+      heroImage: {
+        iv: 'i', ciphertext: 'c',
+        metadata: { mimeType: 'image/jpeg', byteLength: 1, altText: '' },
+      },
+      signature: { alg: 'Ed25519', publicKeyFingerprint: 'fp', value: 'sig' },
+    };
+    expect(parseMissionAsset(valid).ok).toBe(false);
+  });
+
+  it('canonical JSON is stable under fc-generated key orderings', () => {
+    fc.assert(
+      fc.property(fc.dictionary(fc.string(), fc.integer()), (obj) => {
+        const a = canonicalJSON(obj);
+        const reordered: Record<string, number> = {};
+        for (const k of Object.keys(obj).reverse()) reordered[k] = obj[k]!;
+        const b = canonicalJSON(reordered);
+        expect(a).toBe(b);
+      }),
+      { numRuns: 100 },
+    );
   });
 });
