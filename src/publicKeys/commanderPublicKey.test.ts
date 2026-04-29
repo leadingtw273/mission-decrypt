@@ -31,8 +31,10 @@ describe('commander public key placeholder', () => {
   it('exports valid base64url placeholder constants', () => {
     expect(COMMANDER_PUBLIC_KEY_PLACEHOLDER).toBe(COMMANDER_PUBLIC_KEY_B64URL);
     expect(COMMANDER_PUBLIC_KEY_B64URL).toHaveLength(43);
-    // v1 demo: prod placeholder intentionally equals dev test key so _example.json verifies on deployed site.
-    expect(COMMANDER_PUBLIC_KEY_B64URL).toBe(DEV_TEST_COMMANDER_PUBLIC_KEY_B64URL);
+    expect(DEV_TEST_COMMANDER_PUBLIC_KEY_B64URL).toHaveLength(43);
+    // Production commander key is a real (leadingtw) identity, distinct
+    // from the dev test fixture key that signs _example.json.
+    expect(COMMANDER_PUBLIC_KEY_B64URL).not.toBe(DEV_TEST_COMMANDER_PUBLIC_KEY_B64URL);
   });
 
   it('uses the fixed dev test key in dev mode', () => {
