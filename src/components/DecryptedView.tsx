@@ -127,7 +127,7 @@ export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps)
               <motion.img
                 alt={heroImage.altText}
                 animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1 }}
-                className="aspect-video w-full object-contain md:aspect-[4/5] xl:aspect-auto xl:h-full"
+                className="aspect-video w-full object-contain xl:aspect-auto xl:h-full"
                 initial={prefersReducedMotion ? false : { opacity: 0 }}
                 src={heroImageUrl}
                 transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.6, ease: 'easeOut' }}
