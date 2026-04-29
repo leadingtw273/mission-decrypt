@@ -26,6 +26,7 @@ const validAsset = {
     'abc123': { salt: 'AAAA', iv: 'BBBB', wrapped: 'CCCC' },
   },
   fields: {
+    classification: { iv: 'i', ciphertext: 'c' },
     missionCommander: { iv: 'i', ciphertext: 'c' },
     communicationChannel: { iv: 'i', ciphertext: 'c' },
     missionTime: { iv: 'i', ciphertext: 'c' },
@@ -75,8 +76,9 @@ describe('MissionAssetV1 schema', () => {
 });
 
 describe('MissionPlaintextSchema', () => {
-  it('accepts all 9 fields with strings', () => {
+  it('accepts all 10 fields with strings', () => {
     expect(() => MissionPlaintextSchema.parse({
+      classification: 'high',
       missionCommander: 'a', communicationChannel: 'b', missionTime: 'c',
       rallyTime: 'd', rallyLocation: 'e', requiredGear: 'f',
       accessPermission: 'g', rewardDistribution: 'h', missionBrief: 'i',

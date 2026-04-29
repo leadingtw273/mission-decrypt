@@ -26,6 +26,7 @@ const sampleAsset: MissionAssetV1 = {
     abc123: { salt: 'AAAA', iv: 'BBBB', wrapped: 'CCCC' },
   },
   fields: {
+    classification: { iv: 'i', ciphertext: 'c' },
     missionCommander: { iv: 'i', ciphertext: 'c' },
     communicationChannel: { iv: 'i', ciphertext: 'c' },
     missionTime: { iv: 'i', ciphertext: 'c' },
@@ -53,6 +54,7 @@ const sampleAsset: MissionAssetV1 = {
 };
 
 const sampleMission: MissionPlaintext = {
+  classification: 'high',
   missionCommander: 'Lt. Zhou [leadingtw]',
   communicationChannel: 'Strategy Channel > Deep Space',
   missionTime: '22:00 - 24:00 (GMT+8)',

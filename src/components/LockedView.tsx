@@ -6,6 +6,7 @@ import { AnimatedCipherText } from './shared/AnimatedCipherText';
 import { Button } from './shared/Button';
 import { FrameBracket } from './shared/FrameBracket';
 import { Input } from './shared/Input';
+import { MissionHeaderBar } from './shared/MissionHeaderBar';
 
 type LockedViewProps = {
   asset: MissionAssetV1;
@@ -110,18 +111,21 @@ export function LockedView({ asset, onSubmit, submitting }: LockedViewProps) {
           </form>
         </div>
 
-        <div className="grid gap-4">
-          {FIELD_SPECS.map((field) => (
-            <div key={field.name} className="border border-border bg-bg-primary/55 px-4 py-3">
-              <p className="font-label text-[11px] text-text/70">{field.label}</p>
-              <p className="font-body mt-2 break-all text-sm text-primary">
-                <AnimatedCipherText
-                  mode="typewriter"
-                  text={toGibberish(asset.fields[field.name].ciphertext, field.length)}
-                />
-              </p>
-            </div>
-          ))}
+        <div className="flex flex-col gap-4">
+          <MissionHeaderBar state={{ kind: 'locked' }} />
+          <div className="grid gap-4">
+            {FIELD_SPECS.map((field) => (
+              <div key={field.name} className="border border-border bg-bg-primary/55 px-4 py-3">
+                <p className="font-label text-[11px] text-text/70">{field.label}</p>
+                <p className="font-body mt-2 break-all text-sm text-primary">
+                  <AnimatedCipherText
+                    mode="typewriter"
+                    text={toGibberish(asset.fields[field.name].ciphertext, field.length)}
+                  />
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

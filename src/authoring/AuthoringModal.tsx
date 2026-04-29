@@ -30,6 +30,7 @@ type Phase = 'identity-setup' | 'authoring' | 'post-generation';
 type MissionFormState = Record<MissionFieldName, string>;
 
 type MissionFieldName =
+  | 'classification'
   | 'missionCommander'
   | 'communicationChannel'
   | 'missionTime'
@@ -40,19 +41,40 @@ type MissionFieldName =
   | 'rewardDistribution'
   | 'missionBrief';
 
-const MISSION_FIELDS: Array<{ name: MissionFieldName; label: string; multiline?: boolean }> = [
+type MissionFieldKind = 'text' | 'multiline' | 'select' | 'datetime';
+
+interface MissionFieldDef {
+  name: MissionFieldName;
+  label: string;
+  kind?: MissionFieldKind;
+  placeholder?: string;
+  options?: Array<{ value: string; label: string }>;
+}
+
+const MISSION_FIELDS: MissionFieldDef[] = [
+  {
+    name: 'classification',
+    label: 'Classification',
+    kind: 'select',
+    options: [
+      { value: 'extreme', label: 'EXTREME (極) — 不可向任何第三者透露' },
+      { value: 'high', label: 'HIGH (高) — 不可向本團成員以外人員透露' },
+      { value: 'low', label: 'LOW (低) — 不可未經授權對外公開內容' },
+    ],
+  },
   { name: 'missionCommander', label: 'Mission Commander' },
   { name: 'communicationChannel', label: 'Communication Channel' },
-  { name: 'missionTime', label: 'Mission Time' },
-  { name: 'rallyTime', label: 'Rally Time' },
+  { name: 'missionTime', label: 'Estimated Duration', placeholder: 'e.g. 1H, 30M, 2H30M' },
+  { name: 'rallyTime', label: 'Rally Time', kind: 'datetime' },
   { name: 'rallyLocation', label: 'Rally Location' },
   { name: 'requiredGear', label: 'Required Gear' },
   { name: 'accessPermission', label: 'Access Permission' },
   { name: 'rewardDistribution', label: 'Reward Distribution' },
-  { name: 'missionBrief', label: 'Mission Brief', multiline: true },
+  { name: 'missionBrief', label: 'Mission Brief', kind: 'multiline' },
 ];
 
 const EMPTY_FORM: MissionFormState = {
+  classification: 'high',
   missionCommander: '',
   communicationChannel: '',
   missionTime: '',
@@ -63,6 +85,19 @@ const EMPTY_FORM: MissionFormState = {
   rewardDistribution: '',
   missionBrief: '',
 };
+
+function localDatetimeToIso(local: string): string {
+  if (!local) return '';
+  const date = new Date(local);
+  if (Number.isNaN(date.getTime())) return local;
+  const tzOffsetMinutes = -date.getTimezoneOffset();
+  const sign = tzOffsetMinutes >= 0 ? '+' : '-';
+  const absOffset = Math.abs(tzOffsetMinutes);
+  const tzHh = String(Math.floor(absOffset / 60)).padStart(2, '0');
+  const tzMm = String(absOffset % 60).padStart(2, '0');
+  const localPadded = local.length === 16 ? `${local}:00` : local;
+  return `${localPadded}${sign}${tzHh}:${tzMm}`;
+}
 
 export function AuthoringModal({
   open,
@@ -91,7 +126,12 @@ export function AuthoringModal({
       heroAltText.trim().length > 0
       || heroImage !== null
       || members.some((member) => member.trim().length > 0)
-      || Object.values(mission).some((value) => value.trim().length > 0),
+      || Object.entries(mission).some(([key, value]) => {
+        if (key === 'classification') {
+          return value !== EMPTY_FORM.classification;
+        }
+        return value.trim().length > 0;
+      }),
     [heroAltText, heroImage, members, mission],
   );
 
@@ -173,7 +213,10 @@ export function AuthoringModal({
     setIsSubmitting(true);
     try {
       const result = await onGenerate({
-        mission,
+        mission: {
+          ...mission,
+          rallyTime: localDatetimeToIso(mission.rallyTime),
+        },
         heroImage,
         members: members
           .map((member) => member.trim())
@@ -368,10 +411,8 @@ function AuthoringStage(props: {
         {MISSION_FIELDS.map((field) => (
           <MissionFieldControl
             key={field.name}
-            label={field.label}
-            name={field.name}
+            field={field}
             value={props.mission[field.name]}
-            {...(field.multiline ? { multiline: true } : {})}
             onChange={(value) => props.onUpdateMission(field.name, value)}
           />
         ))}
@@ -450,30 +491,54 @@ function AuthoringStage(props: {
 }
 
 function MissionFieldControl(props: {
-  name: MissionFieldName;
-  label: string;
+  field: MissionFieldDef;
   value: string;
-  multiline?: boolean;
   onChange: (value: string) => void;
 }) {
   const id = useId();
+  const { field } = props;
+  const kind = field.kind ?? 'text';
 
   return (
     <label className="space-y-2" htmlFor={id}>
-      <span className="font-label text-xs uppercase tracking-[0.22em] text-text/72">{props.label}</span>
-      {props.multiline ? (
+      <span className="font-label text-xs uppercase tracking-[0.22em] text-text/72">{field.label}</span>
+      {kind === 'multiline' ? (
         <textarea
-          aria-label={props.label}
+          aria-label={field.label}
           className="font-body min-h-32 w-full resize-y border border-border bg-bg-secondary/70 px-5 py-4 text-text outline-none transition focus:border-primary"
           id={id}
           required
           value={props.value}
           onChange={(event) => props.onChange(event.currentTarget.value)}
         />
+      ) : kind === 'select' ? (
+        <select
+          aria-label={field.label}
+          className="font-body w-full border border-border bg-bg-secondary/70 px-4 py-3 text-text outline-none transition focus:border-primary"
+          id={id}
+          required
+          value={props.value}
+          onChange={(event) => props.onChange(event.currentTarget.value)}
+        >
+          {field.options?.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      ) : kind === 'datetime' ? (
+        <Input
+          aria-label={field.label}
+          id={id}
+          type="datetime-local"
+          value={props.value}
+          onChange={(event) => props.onChange(event.currentTarget.value)}
+        />
       ) : (
         <Input
-          aria-label={props.label}
+          aria-label={field.label}
           id={id}
+          {...(field.placeholder ? { placeholder: field.placeholder } : {})}
           value={props.value}
           onChange={(event) => props.onChange(event.currentTarget.value)}
         />

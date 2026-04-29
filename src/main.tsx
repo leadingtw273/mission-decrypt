@@ -24,6 +24,7 @@ if (new URLSearchParams(location.search).has('cross-browser-harness')) {
         const { privateKey, publicKey } = await generateSigningKeypair();
         const { asset, links } = await encryptMission({
           mission: {
+            classification: 'high',
             missionCommander: 'Test', communicationChannel: 'X', missionTime: 'Y',
             rallyTime: 'Z', rallyLocation: 'W', requiredGear: 'V',
             accessPermission: 'U', rewardDistribution: 'T', missionBrief: 'S',

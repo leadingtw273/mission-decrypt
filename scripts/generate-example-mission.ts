@@ -16,10 +16,11 @@ const DEV_TEST_COMMANDER_PRIVATE_JWK: JsonWebKey = {
 };
 
 const exampleMission = {
+  classification: 'high',
   missionCommander: '老周【leadingtw】',
   communicationChannel: '戰略頻道 > 星際遨遊',
-  missionTime: '21:00 - 23:00 (GMT+8)',
-  rallyTime: '20:30 (GMT+8)',
+  missionTime: '2H',
+  rallyTime: '2026-04-29T20:30:00+08:00',
   rallyLocation: '奧里森空域，進入隊伍跳點',
   requiredGear: '隨意，自身主武器彈藥備足(約40匣)',
   accessPermission: '所有人，若有阿波蘿，請開阿波蘿與備好隊伍凝膠到指定地點',

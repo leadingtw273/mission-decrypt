@@ -5,8 +5,8 @@ const HERO_IMAGE_PATH = new URL('./fixtures/hero.jpg', import.meta.url).pathname
 const missionFields = {
   missionCommander: 'Commander Lyra Voss',
   communicationChannel: 'VHF-7 encrypted relay',
-  missionTime: '2956-11-03 23:40 UTC',
-  rallyTime: '2956-11-03 23:10 UTC',
+  missionTime: '2H30M',
+  rallyTimeLocal: '2956-11-03T23:10',
   rallyLocation: 'Orison Platform 4, Crusader',
   requiredGear: 'Thermal cloak, medpens, railgun',
   accessPermission: 'Level 4 green badge',
@@ -43,10 +43,11 @@ test('authoring download can be routed back into decryption flow', async ({ page
   await page.getByRole('button', { name: 'Generate Commander Identity' }).click();
   await expect(page.getByRole('textbox', { name: 'Mission Commander' })).toBeVisible();
 
+  await page.getByLabel('Classification').selectOption('high');
   await page.getByRole('textbox', { name: 'Mission Commander' }).fill(missionFields.missionCommander);
   await page.getByRole('textbox', { name: 'Communication Channel' }).fill(missionFields.communicationChannel);
-  await page.getByRole('textbox', { name: 'Mission Time' }).fill(missionFields.missionTime);
-  await page.getByRole('textbox', { name: 'Rally Time' }).fill(missionFields.rallyTime);
+  await page.getByRole('textbox', { name: 'Estimated Duration' }).fill(missionFields.missionTime);
+  await page.getByLabel('Rally Time').fill(missionFields.rallyTimeLocal);
   await page.getByRole('textbox', { name: 'Rally Location' }).fill(missionFields.rallyLocation);
   await page.getByRole('textbox', { name: 'Required Gear' }).fill(missionFields.requiredGear);
   await page.getByRole('textbox', { name: 'Access Permission' }).fill(missionFields.accessPermission);
@@ -113,7 +114,6 @@ test('authoring download can be routed back into decryption flow', async ({ page
   await expect(page.getByText(missionFields.missionCommander, { exact: true })).toBeVisible();
   await expect(page.getByText(missionFields.communicationChannel, { exact: true })).toBeVisible();
   await expect(page.getByText(missionFields.missionTime, { exact: true })).toBeVisible();
-  await expect(page.getByText(missionFields.rallyTime, { exact: true })).toBeVisible();
   await expect(page.getByText(missionFields.rallyLocation, { exact: true })).toBeVisible();
   await expect(page.getByText(missionFields.requiredGear, { exact: true })).toBeVisible();
   await expect(page.getByText(missionFields.accessPermission, { exact: true })).toBeVisible();

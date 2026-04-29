@@ -29,6 +29,7 @@ function createSampleResult(missionId: string): GenerateMissionResult {
       },
       wrappedKeys: {},
       fields: {
+        classification: { iv: 'a', ciphertext: 'b' },
         missionCommander: { iv: 'a', ciphertext: 'b' },
         communicationChannel: { iv: 'a', ciphertext: 'b' },
         missionTime: { iv: 'a', ciphertext: 'b' },

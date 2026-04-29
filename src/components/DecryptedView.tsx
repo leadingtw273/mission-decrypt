@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 import type { MissionAssetV1, MissionPlaintext } from '../crypto';
-import type { FieldName } from '../crypto/schema';
+import type { ClassificationLevel, FieldName } from '../crypto/schema';
 import { AnimatedCipherText } from './shared/AnimatedCipherText';
 import { FrameBracket } from './shared/FrameBracket';
-import { ProgressBar } from './shared/ProgressBar';
+import { MissionHeaderBar } from './shared/MissionHeaderBar';
 import { ScannerSweep } from './shared/ScannerSweep';
 import { usePrefersReducedMotion } from './shared/usePrefersReducedMotion';
 
@@ -31,7 +31,7 @@ const FIELD_SPECS: Array<{ name: FieldName; label: string }> = [
   { name: 'missionBrief', label: 'MISSION BRIEF' },
 ];
 
-const REVEAL_DURATION_MS = 3000;
+const REVEAL_DURATION_MS = 8000;
 const FIELD_STAGGER_MS = REVEAL_DURATION_MS / FIELD_SPECS.length;
 
 export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps) {
@@ -102,15 +102,17 @@ export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps)
         </div>
 
         <div className="flex flex-col gap-4">
-          {!showImage ? (
-            <div className="flex items-center gap-3 border border-border bg-bg-primary/40 px-3 py-2">
-              <span className="font-label text-xs text-primary">{Math.round(progress * 100)}%</span>
-              <div className="flex-1">
-                <ProgressBar progress={progress} />
-              </div>
-              <span aria-hidden="true" className="text-primary">▶</span>
-            </div>
-          ) : null}
+          <MissionHeaderBar
+            state={
+              showImage
+                ? {
+                    kind: 'decrypted',
+                    classification: mission.classification as ClassificationLevel,
+                    rallyTimeIso: mission.rallyTime,
+                  }
+                : { kind: 'decrypting', progress }
+            }
+          />
 
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
             {FIELD_SPECS.map((field, index) => (

@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -46,6 +46,7 @@ const sampleResult: GenerateMissionResult = {
     },
     wrappedKeys: {},
     fields: {
+      classification: { iv: 'a', ciphertext: 'b' },
       missionCommander: { iv: 'a', ciphertext: 'b' },
       communicationChannel: { iv: 'a', ciphertext: 'b' },
       missionTime: { iv: 'a', ciphertext: 'b' },
@@ -170,10 +171,11 @@ describe('AuthoringModal', () => {
       />,
     );
 
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Classification' }), 'extreme');
     await user.type(screen.getByRole('textbox', { name: 'Mission Commander' }), 'Commander Lyra Voss');
     await user.type(screen.getByRole('textbox', { name: 'Communication Channel' }), 'VHF-7 encrypted relay');
-    await user.type(screen.getByRole('textbox', { name: 'Mission Time' }), '23:40 UTC');
-    await user.type(screen.getByRole('textbox', { name: 'Rally Time' }), '23:10 UTC');
+    await user.type(screen.getByRole('textbox', { name: 'Estimated Duration' }), '2H');
+    fireEvent.change(screen.getByLabelText('Rally Time'), { target: { value: '2026-04-29T23:10' } });
     await user.type(screen.getByRole('textbox', { name: 'Rally Location' }), 'Pier 19, East Harbor');
     await user.type(screen.getByRole('textbox', { name: 'Required Gear' }), 'Thermal cloak');
     await user.type(screen.getByRole('textbox', { name: 'Access Permission' }), 'Level 4');
@@ -189,17 +191,18 @@ describe('AuthoringModal', () => {
 
     expect(mockedPickImage).toHaveBeenCalledWith('Night approach');
     expect(onGenerate).toHaveBeenCalledWith({
-      mission: {
+      mission: expect.objectContaining({
+        classification: 'extreme',
         missionCommander: 'Commander Lyra Voss',
         communicationChannel: 'VHF-7 encrypted relay',
-        missionTime: '23:40 UTC',
-        rallyTime: '23:10 UTC',
+        missionTime: '2H',
+        rallyTime: expect.stringMatching(/^2026-04-29T23:10:00[+-]\d{2}:\d{2}$/),
         rallyLocation: 'Pier 19, East Harbor',
         requiredGear: 'Thermal cloak',
         accessPermission: 'Level 4',
         rewardDistribution: '40/30/20/10',
         missionBrief: 'Extract the courier.',
-      },
+      }),
       heroImage: sampleImage,
       members: [{ gameId: 'pilot7' }, { gameId: 'ace42' }],
       identity: { privateKey: sampleIdentity.privateKey },
