@@ -201,18 +201,17 @@ function ExtremeWarningPanel({
   onCancel: () => void;
 }) {
   return (
-    <div className="flex h-full min-h-[20rem] w-full flex-col items-center justify-center gap-5 px-6 py-8 text-center xl:min-h-0">
-      <div className="flex items-center gap-3">
-        <span aria-hidden="true" className="font-display text-3xl text-red-500">⚠</span>
-        <span className="font-display text-base font-bold tracking-[0.28em] text-red-500 md:text-lg">
-          EXTREME CLASSIFICATION
-        </span>
-        <span aria-hidden="true" className="font-display text-3xl text-red-500">⚠</span>
-      </div>
-      <p className="font-body max-w-sm text-sm leading-relaxed text-text/85">
-        正在解密「<span className="font-display font-bold text-red-500">極</span>」機密任務內容
+    <div className="flex h-full min-h-[22rem] w-full flex-col items-center justify-center gap-5 px-6 py-8 text-center xl:min-h-0">
+      <WarningTriangleIcon />
+      <span className="font-display text-lg font-bold tracking-[0.28em] text-red-500 md:text-xl">
+        EXTREME CLASSIFICATION
+      </span>
+      <p className="font-body max-w-md text-base leading-relaxed text-text/90">
+        正在解密「
+        <span className="font-display font-bold text-red-500">EXTREME (極)</span>
+        」機密任務內容
       </p>
-      <ul className="font-body max-w-sm space-y-2 text-left text-xs leading-relaxed text-text/70">
+      <ul className="font-body max-w-md space-y-2 text-left text-sm leading-relaxed text-text/80">
         <li className="flex gap-2">
           <span aria-hidden="true" className="text-primary">›</span>
           <span>嚴禁向任何第三方透露此任務內容。</span>
@@ -226,7 +225,7 @@ function ExtremeWarningPanel({
           <span>違者按照團隊紀律處置。</span>
         </li>
       </ul>
-      <div className="mt-2 flex w-full max-w-sm flex-col gap-2 sm:flex-row">
+      <div className="mt-2 flex w-full max-w-md flex-col gap-2 sm:flex-row">
         <Button
           aria-label="繼續解密"
           className="flex-1"
@@ -247,6 +246,33 @@ function ExtremeWarningPanel({
         </Button>
       </div>
     </div>
+  );
+}
+
+function WarningTriangleIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-20 w-20 text-red-500 drop-shadow-[0_0_18px_rgba(239,68,68,0.45)] md:h-24 md:w-24"
+      fill="none"
+      viewBox="0 0 96 96"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M48 8 L90 84 H6 Z"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinejoin="round"
+        fill="rgba(239, 68, 68, 0.12)"
+      />
+      <path
+        d="M48 38 V62"
+        stroke="currentColor"
+        strokeWidth="6"
+        strokeLinecap="round"
+      />
+      <circle cx="48" cy="74" r="4" fill="currentColor" />
+    </svg>
   );
 }
 
