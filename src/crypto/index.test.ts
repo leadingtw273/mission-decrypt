@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { encryptMission, decryptMission, type MissionPlaintext } from './index';
+import { addMissionMember, encryptMission, decryptMission, type MissionPlaintext } from './index';
 import { generateSigningKeypair, exportPublicKey, importPublicKey } from './sign';
 
 const samplePlaintext: MissionPlaintext = {
@@ -179,5 +179,126 @@ describe('AAD binding regression', () => {
     });
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.reason).toBe('forged_asset');
+  }, 60_000);
+});
+
+describe('addMissionMember', () => {
+  it('lets a new member decrypt without disturbing existing members', async () => {
+    const { privateKey: cmdPriv, publicKey: cmdPub } = await generateSigningKeypair();
+    const { asset, links } = await encryptMission({
+      mission: samplePlaintext,
+      heroImage: sampleHero,
+      members: [{ gameId: 'leadingtw' }],
+      commanderPrivateKey: cmdPriv,
+    });
+    const originalLink = links[0]!;
+
+    const { asset: extendedAsset, links: newLinks } = await addMissionMember({
+      asset,
+      commanderPrivateKey: cmdPriv,
+      knownGameId: 'leadingtw',
+      knownPersonalKey: originalLink.personalKey,
+      newMembers: [{ gameId: 'ace_pilot_42' }, { gameId: 'pilot_77' }],
+    });
+
+    expect(newLinks).toHaveLength(2);
+    expect(extendedAsset.missionId).toBe(asset.missionId);
+    expect(extendedAsset.signature.value).not.toBe(asset.signature.value);
+
+    // Existing member can still decrypt with the same personalKey
+    const original = await decryptMission({
+      asset: extendedAsset,
+      commanderPublicKey: cmdPub,
+      gameId: 'leadingtw',
+      personalKey: originalLink.personalKey,
+    });
+    expect(original.ok).toBe(true);
+    if (original.ok) expect(original.mission).toEqual(samplePlaintext);
+
+    // Each new member can decrypt with their freshly-issued key
+    for (const link of newLinks) {
+      const result = await decryptMission({
+        asset: extendedAsset,
+        commanderPublicKey: cmdPub,
+        gameId: link.gameId,
+        personalKey: link.personalKey,
+      });
+      expect(result.ok).toBe(true);
+      if (result.ok) expect(result.mission).toEqual(samplePlaintext);
+    }
+  }, 60_000);
+
+  it('rejects bad known credentials', async () => {
+    const { privateKey: cmdPriv } = await generateSigningKeypair();
+    const { asset, links } = await encryptMission({
+      mission: samplePlaintext,
+      heroImage: sampleHero,
+      members: [{ gameId: 'leadingtw' }],
+      commanderPrivateKey: cmdPriv,
+    });
+    const originalLink = links[0]!;
+
+    // Wrong gameId → not in wrappedKeys
+    await expect(
+      addMissionMember({
+        asset,
+        commanderPrivateKey: cmdPriv,
+        knownGameId: 'someone_else',
+        knownPersonalKey: originalLink.personalKey,
+        newMembers: [{ gameId: 'newpilot' }],
+      }),
+    ).rejects.toThrow(/known member not found/i);
+
+    // Wrong personalKey on right gameId → AES-GCM auth fails
+    const wrongKey = originalLink.personalKey.slice(0, -1) + (originalLink.personalKey.slice(-1) === '0' ? '1' : '0');
+    await expect(
+      addMissionMember({
+        asset,
+        commanderPrivateKey: cmdPriv,
+        knownGameId: 'leadingtw',
+        knownPersonalKey: wrongKey,
+        newMembers: [{ gameId: 'newpilot' }],
+      }),
+    ).rejects.toThrow(/recover master key|invalid_personal_key_format/i);
+  }, 60_000);
+
+  it('rejects adding an already-enrolled gameId', async () => {
+    const { privateKey: cmdPriv } = await generateSigningKeypair();
+    const { asset, links } = await encryptMission({
+      mission: samplePlaintext,
+      heroImage: sampleHero,
+      members: [{ gameId: 'leadingtw' }, { gameId: 'ace42' }],
+      commanderPrivateKey: cmdPriv,
+    });
+
+    await expect(
+      addMissionMember({
+        asset,
+        commanderPrivateKey: cmdPriv,
+        knownGameId: 'leadingtw',
+        knownPersonalKey: links[0]!.personalKey,
+        newMembers: [{ gameId: 'ACE42' }], // normalises to ace42
+      }),
+    ).rejects.toThrow(/already a member/i);
+  }, 60_000);
+
+  it('rejects empty newMembers', async () => {
+    const { privateKey: cmdPriv } = await generateSigningKeypair();
+    const { asset, links } = await encryptMission({
+      mission: samplePlaintext,
+      heroImage: sampleHero,
+      members: [{ gameId: 'leadingtw' }],
+      commanderPrivateKey: cmdPriv,
+    });
+
+    await expect(
+      addMissionMember({
+        asset,
+        commanderPrivateKey: cmdPriv,
+        knownGameId: 'leadingtw',
+        knownPersonalKey: links[0]!.personalKey,
+        newMembers: [],
+      }),
+    ).rejects.toThrow(/cannot be empty/i);
   }, 60_000);
 });

@@ -166,6 +166,137 @@ export async function encryptMission(input: {
   return { asset, links };
 }
 
+export async function addMissionMember(input: {
+  asset: MissionAssetV1;
+  commanderPrivateKey: CryptoKey;
+  knownGameId: string;
+  knownPersonalKey: string;
+  newMembers: MemberInput[];
+}): Promise<{ asset: MissionAssetV1; links: MemberLink[] }> {
+  const { asset, commanderPrivateKey, knownGameId, knownPersonalKey, newMembers } = input;
+
+  if (newMembers.length === 0) {
+    throw new Error('newMembers cannot be empty');
+  }
+
+  // Normalize and dedupe new members against themselves
+  const normalizedNew = newMembers.map((m) => ({
+    raw: m.gameId,
+    norm: normalizeGameId(m.gameId),
+  }));
+  const seen = new Set<string>();
+  for (const m of normalizedNew) {
+    if (seen.has(m.norm)) throw new Error(`duplicate normalized gameId in newMembers: ${m.norm}`);
+    seen.add(m.norm);
+  }
+
+  // 1) Recover M via known member's wrappedKey
+  const knownNorm = normalizeGameId(knownGameId);
+  const knownLookupKey = toBase64Url(
+    await hmacSha256(utf8Encode(asset.missionId), utf8Encode(knownNorm)),
+  );
+  const knownWrapped = asset.wrappedKeys[knownLookupKey];
+  if (!knownWrapped) {
+    throw new Error('known member not found in this mission');
+  }
+
+  if (!validatePersonalKey(knownPersonalKey)) {
+    throw new Error('invalid_personal_key_format');
+  }
+
+  const knownPkParsed = parsePersonalKey(knownPersonalKey);
+  const knownWrapKey = await deriveWrapKey(
+    knownPkParsed,
+    fromBase64Url(knownWrapped.salt),
+    asset.params.kdfIterations,
+  );
+  const knownAad = aadForWrap({
+    schemaVersion: SCHEMA_VERSION,
+    cryptoVersion: CRYPTO_VERSION,
+    missionId: asset.missionId,
+    lookupKey: knownLookupKey,
+    params: asset.params,
+  });
+
+  let Mraw: Uint8Array;
+  try {
+    Mraw = await aesGcmDecrypt(
+      knownWrapKey,
+      fromBase64Url(knownWrapped.iv),
+      fromBase64Url(knownWrapped.wrapped),
+      knownAad,
+    );
+  } catch {
+    throw new Error('failed to recover master key — known credentials invalid');
+  }
+
+  // 2) Wrap M for each new member
+  const updatedWrappedKeys: Record<string, { salt: string; iv: string; wrapped: string }> = {
+    ...asset.wrappedKeys,
+  };
+  const links: MemberLink[] = [];
+
+  for (const newMember of normalizedNew) {
+    const newLookupKey = toBase64Url(
+      await hmacSha256(utf8Encode(asset.missionId), utf8Encode(newMember.norm)),
+    );
+    if (updatedWrappedKeys[newLookupKey]) {
+      throw new Error(`gameId already a member: ${newMember.norm}`);
+    }
+
+    const newPersonalKey = generatePersonalKey();
+    const newPkParsed = parsePersonalKey(newPersonalKey);
+    const salt = crypto.getRandomValues(new Uint8Array(asset.params.saltLength));
+    const newWrapKey = await deriveWrapKey(newPkParsed, salt, asset.params.kdfIterations);
+    const newIv = crypto.getRandomValues(new Uint8Array(asset.params.ivLength));
+    const newAad = aadForWrap({
+      schemaVersion: SCHEMA_VERSION,
+      cryptoVersion: CRYPTO_VERSION,
+      missionId: asset.missionId,
+      lookupKey: newLookupKey,
+      params: asset.params,
+    });
+    const wrapped = await aesGcmEncrypt(newWrapKey, newIv, Mraw, newAad);
+
+    updatedWrappedKeys[newLookupKey] = {
+      salt: toBase64Url(salt),
+      iv: toBase64Url(newIv),
+      wrapped: toBase64Url(wrapped),
+    };
+    links.push({
+      gameId: newMember.raw,
+      personalKey: newPersonalKey,
+      url: `${typeof location !== 'undefined' ? location.origin : 'https://vesper.example'}/?mission_id=${asset.missionId}`,
+    });
+  }
+
+  // 3) Build asset_without_signature with updated wrappedKeys; everything else
+  // (fields ciphertext, heroImage, params, missionId, etc.) stays untouched.
+  const { signature: _oldSig, ...assetWithoutSignature } = asset;
+  void _oldSig;
+  const updatedAssetWithoutSig = {
+    ...assetWithoutSignature,
+    wrappedKeys: updatedWrappedKeys,
+  };
+
+  // 4) Re-sign canonical JSON
+  const signedBytes = utf8Encode(canonicalJSON(updatedAssetWithoutSig));
+  const signatureBytes = await ed25519Sign(commanderPrivateKey, signedBytes);
+  const commanderPublicKey = await deriveCommanderPublicKey(commanderPrivateKey);
+  const fp = await fingerprint(commanderPublicKey);
+
+  const newAsset: MissionAssetV1 = {
+    ...updatedAssetWithoutSig,
+    signature: {
+      alg: 'Ed25519',
+      publicKeyFingerprint: fp,
+      value: toBase64Url(signatureBytes),
+    },
+  };
+
+  return { asset: newAsset, links };
+}
+
 async function deriveCommanderPublicKey(privateKey: CryptoKey): Promise<CryptoKey> {
   // Web Crypto requires deriving public key from JWK export (strip the 'd' private field)
   const jwk = await crypto.subtle.exportKey('jwk', privateKey);
@@ -282,5 +413,6 @@ export async function decryptMission(input: {
 }
 
 export type { MissionAssetV1, MissionPlaintext, MemberInput, MemberLink, DecryptErrorReason } from './schema';
+export { parseMissionAsset } from './schema';
 export { generatePersonalKey, validatePersonalKey } from './personalKey';
 export { normalizeGameId } from './normalization';

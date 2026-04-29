@@ -9,7 +9,9 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 
-import type { MissionPlaintext } from '../crypto';
+import type { MissionAssetV1, MissionPlaintext } from '../crypto';
+import { parseMissionAsset } from '../crypto';
+import type { ExtendMissionInput, ExtendMissionResult } from './extendMission';
 import type { GenerateMissionInput, GenerateMissionResult } from './generateMission';
 import type { CommanderIdentity } from './identity';
 import { pickImage, type PickedImage } from './pickImage';
@@ -23,11 +25,13 @@ export interface AuthoringModalProps {
   open: boolean;
   onClose: () => void;
   onGenerate: (input: GenerateMissionInput) => Promise<GenerateMissionResult>;
+  onExtend?: (input: ExtendMissionInput) => Promise<ExtendMissionResult>;
   identity: CommanderIdentity | null;
   onGenerateIdentity: () => Promise<CommanderIdentity>;
 }
 
 type Phase = 'identity-setup' | 'authoring' | 'post-generation';
+type AuthoringMode = 'create' | 'extend';
 type MissionFormState = Record<MissionFieldName, string>;
 
 type MissionFieldName =
@@ -174,6 +178,7 @@ export function AuthoringModal({
   open,
   onClose,
   onGenerate,
+  onExtend,
   identity,
   onGenerateIdentity,
 }: AuthoringModalProps) {
@@ -182,6 +187,7 @@ export function AuthoringModal({
 
   const [localIdentity, setLocalIdentity] = useState<CommanderIdentity | null>(null);
   const [phase, setPhase] = useState<Phase>('identity-setup');
+  const [authoringMode, setAuthoringMode] = useState<AuthoringMode>('create');
   const [mission, setMission] = useState<MissionFormState>(EMPTY_FORM);
   const [heroAltText, setHeroAltText] = useState('');
   const [heroImage, setHeroImage] = useState<PickedImage | null>(null);
@@ -190,6 +196,14 @@ export function AuthoringModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generatedResult, setGeneratedResult] = useState<GenerateMissionResult | null>(null);
   const [generatedFingerprint, setGeneratedFingerprint] = useState<string | null>(null);
+
+  // Extend-mission state
+  const [extendAsset, setExtendAsset] = useState<MissionAssetV1 | null>(null);
+  const [extendAssetError, setExtendAssetError] = useState<string | null>(null);
+  const [extendKnownGameId, setExtendKnownGameId] = useState('');
+  const [extendKnownPersonalKey, setExtendKnownPersonalKey] = useState('');
+  const [extendNewMembers, setExtendNewMembers] = useState<string[]>(['']);
+  const [extendError, setExtendError] = useState<string | null>(null);
 
   const effectiveIdentity = identity ?? localIdentity;
   const dirty = useMemo(
@@ -209,6 +223,7 @@ export function AuthoringModal({
   useEffect(() => {
     if (!open) {
       setPhase(identity ? 'authoring' : 'identity-setup');
+      setAuthoringMode('create');
       setLocalIdentity(null);
       setGeneratedResult(null);
       setGeneratedFingerprint(null);
@@ -218,6 +233,12 @@ export function AuthoringModal({
       setMembers(['']);
       setIsGeneratingIdentity(false);
       setIsSubmitting(false);
+      setExtendAsset(null);
+      setExtendAssetError(null);
+      setExtendKnownGameId('');
+      setExtendKnownPersonalKey('');
+      setExtendNewMembers(['']);
+      setExtendError(null);
       return;
     }
 
@@ -273,6 +294,65 @@ export function AuthoringModal({
   async function handlePickImage() {
     const pickedImage = await pickImage(heroAltText);
     setHeroImage(pickedImage);
+  }
+
+  async function handleExtendAssetFile(file: File) {
+    setExtendAssetError(null);
+    setExtendAsset(null);
+    try {
+      const text = await file.text();
+      const json = JSON.parse(text) as unknown;
+      const result = parseMissionAsset(json);
+      if (!result.ok) {
+        setExtendAssetError(`不是合法的 mission asset：${result.error}`);
+        return;
+      }
+      setExtendAsset(result.value);
+    } catch (error) {
+      setExtendAssetError(`讀檔失敗：${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  async function handleExtendSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!effectiveIdentity || !extendAsset || !onExtend) return;
+
+    const trimmedNewMembers = extendNewMembers
+      .map((member) => member.trim())
+      .filter((member) => member.length > 0)
+      .map((gameId) => ({ gameId }));
+
+    if (trimmedNewMembers.length === 0) {
+      setExtendError('至少要加一位新成員');
+      return;
+    }
+
+    setExtendError(null);
+    setIsSubmitting(true);
+    try {
+      const result = await onExtend({
+        asset: extendAsset,
+        identity: { privateKey: effectiveIdentity.privateKey },
+        knownGameId: extendKnownGameId.trim(),
+        knownPersonalKey: extendKnownPersonalKey.trim(),
+        newMembers: trimmedNewMembers,
+      });
+      setGeneratedResult({
+        missionId: result.missionId,
+        asset: result.asset,
+        links: result.links,
+      });
+      try {
+        setGeneratedFingerprint(await fingerprint(effectiveIdentity.publicKey));
+      } catch {
+        setGeneratedFingerprint(null);
+      }
+      setPhase('post-generation');
+    } catch (error) {
+      setExtendError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -395,22 +475,48 @@ export function AuthoringModal({
             ) : null}
 
             {phase === 'authoring' ? (
-              <AuthoringStage
-                heroAltText={heroAltText}
-                heroImage={heroImage}
-                isSubmitting={isSubmitting}
-                members={members}
-                mission={mission}
-                onAddMember={() => setMembers((current) => [...current, ''])}
-                onHeroAltTextChange={setHeroAltText}
-                onPickImage={handlePickImage}
-                onRemoveMember={(index) =>
-                  setMembers((current) => current.length === 1 ? current : current.filter((_, currentIndex) => currentIndex !== index))}
-                onSubmit={handleSubmit}
-                onUpdateMember={(index, value) =>
-                  setMembers((current) => current.map((member, currentIndex) => currentIndex === index ? value : member))}
-                onUpdateMission={(field, value) => setMission((current) => ({ ...current, [field]: value }))}
-              />
+              <>
+                {onExtend ? (
+                  <ModeTabs mode={authoringMode} onModeChange={setAuthoringMode} />
+                ) : null}
+                {authoringMode === 'create' ? (
+                  <AuthoringStage
+                    heroAltText={heroAltText}
+                    heroImage={heroImage}
+                    isSubmitting={isSubmitting}
+                    members={members}
+                    mission={mission}
+                    onAddMember={() => setMembers((current) => [...current, ''])}
+                    onHeroAltTextChange={setHeroAltText}
+                    onPickImage={handlePickImage}
+                    onRemoveMember={(index) =>
+                      setMembers((current) => current.length === 1 ? current : current.filter((_, currentIndex) => currentIndex !== index))}
+                    onSubmit={handleSubmit}
+                    onUpdateMember={(index, value) =>
+                      setMembers((current) => current.map((member, currentIndex) => currentIndex === index ? value : member))}
+                    onUpdateMission={(field, value) => setMission((current) => ({ ...current, [field]: value }))}
+                  />
+                ) : (
+                  <ExtendStage
+                    asset={extendAsset}
+                    assetError={extendAssetError}
+                    error={extendError}
+                    isSubmitting={isSubmitting}
+                    knownGameId={extendKnownGameId}
+                    knownPersonalKey={extendKnownPersonalKey}
+                    newMembers={extendNewMembers}
+                    onAssetFile={handleExtendAssetFile}
+                    onAddMember={() => setExtendNewMembers((current) => [...current, ''])}
+                    onKnownGameIdChange={setExtendKnownGameId}
+                    onKnownPersonalKeyChange={setExtendKnownPersonalKey}
+                    onRemoveMember={(index) =>
+                      setExtendNewMembers((current) => current.length === 1 ? current : current.filter((_, i) => i !== index))}
+                    onSubmit={handleExtendSubmit}
+                    onUpdateMember={(index, value) =>
+                      setExtendNewMembers((current) => current.map((member, i) => (i === index ? value : member)))}
+                  />
+                )}
+              </>
             ) : null}
 
             {phase === 'post-generation' ? (
@@ -680,6 +786,174 @@ function MemberFieldRow(props: {
         </Button>
       ) : null}
     </div>
+  );
+}
+
+function ModeTabs({
+  mode,
+  onModeChange,
+}: {
+  mode: AuthoringMode;
+  onModeChange: (mode: AuthoringMode) => void;
+}) {
+  const tabClass = (active: boolean) =>
+    `font-label flex-1 border px-4 py-2 text-xs uppercase tracking-[0.22em] transition ${
+      active
+        ? 'border-primary bg-primary/10 text-primary'
+        : 'border-border bg-bg-secondary/40 text-text/55 hover:border-primary/40 hover:text-primary'
+    }`;
+
+  return (
+    <div className="mb-6 flex gap-2">
+      <button
+        type="button"
+        className={tabClass(mode === 'create')}
+        onClick={() => onModeChange('create')}
+      >
+        Create New Mission
+      </button>
+      <button
+        type="button"
+        className={tabClass(mode === 'extend')}
+        onClick={() => onModeChange('extend')}
+      >
+        Extend Existing Mission
+      </button>
+    </div>
+  );
+}
+
+function ExtendStage(props: {
+  asset: MissionAssetV1 | null;
+  assetError: string | null;
+  error: string | null;
+  isSubmitting: boolean;
+  knownGameId: string;
+  knownPersonalKey: string;
+  newMembers: string[];
+  onAssetFile: (file: File) => void;
+  onAddMember: () => void;
+  onKnownGameIdChange: (value: string) => void;
+  onKnownPersonalKeyChange: (value: string) => void;
+  onRemoveMember: (index: number) => void;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onUpdateMember: (index: number, value: string) => void;
+}) {
+  const fileInputId = useId();
+  const knownGameIdId = useId();
+  const knownKeyId = useId();
+  const memberCount = props.asset ? Object.keys(props.asset.wrappedKeys).length : 0;
+
+  return (
+    <form className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]" onSubmit={props.onSubmit}>
+      <div className="grid gap-5 content-start">
+        <div className="border border-border bg-bg-secondary/60 px-4 py-4">
+          <p className="font-label text-xs uppercase tracking-[0.22em] text-primary">Existing Mission</p>
+          <p className="font-body mt-2 text-[11px] leading-relaxed text-text/55">
+            上傳之前產生的 mission JSON（位於 <code className="text-primary">public/missions/</code>），系統會用既有成員的 personal key 還原 master key、為新成員產生 wrap、並重新簽章。
+          </p>
+
+          <label htmlFor={fileInputId} className="font-body mt-4 block cursor-pointer border border-dashed border-primary/40 bg-bg-primary/30 px-4 py-3 text-sm text-text/80 transition hover:border-primary hover:bg-bg-primary/50">
+            {props.asset ? `已載入：${props.asset.missionId}（${memberCount} 位現有成員）` : '點擊或拖入 JSON 檔'}
+          </label>
+          <input
+            className="hidden"
+            id={fileInputId}
+            type="file"
+            accept="application/json"
+            onChange={(event) => {
+              const file = event.currentTarget.files?.[0];
+              if (file) props.onAssetFile(file);
+              event.currentTarget.value = '';
+            }}
+          />
+
+          {props.assetError ? (
+            <p className="font-body mt-2 text-[11px] leading-relaxed text-danger">{props.assetError}</p>
+          ) : null}
+        </div>
+
+        <div className="border border-border bg-bg-secondary/60 px-4 py-4 space-y-4">
+          <p className="font-label text-xs uppercase tracking-[0.22em] text-primary">Known Member Credentials</p>
+          <p className="font-body text-[11px] leading-relaxed text-text/55">
+            提供任一現有成員的 game ID + personal key，用來解開 wrappedKey 取回 master key（不會修改既有 wrap，所有現有成員的 personal key 不變）。
+          </p>
+
+          <label className="space-y-2 block" htmlFor={knownGameIdId}>
+            <span className="font-label text-xs uppercase tracking-[0.22em] text-text/72">Known Game ID</span>
+            <Input
+              aria-label="Known Game ID"
+              id={knownGameIdId}
+              value={props.knownGameId}
+              onChange={(event) => props.onKnownGameIdChange(event.currentTarget.value)}
+            />
+          </label>
+
+          <label className="space-y-2 block" htmlFor={knownKeyId}>
+            <span className="font-label text-xs uppercase tracking-[0.22em] text-text/72">Known Personal Key</span>
+            <Input
+              aria-label="Known Personal Key"
+              id={knownKeyId}
+              type="password"
+              placeholder="XXXX-XXXX-XXXX-XXXX"
+              value={props.knownPersonalKey}
+              onChange={(event) => props.onKnownPersonalKeyChange(event.currentTarget.value)}
+            />
+          </label>
+        </div>
+      </div>
+
+      <div className="grid gap-5 content-start">
+        <FrameBracket
+          size={20}
+          color="primary"
+          className="block border border-primary/25 bg-bg-secondary/60 px-4 py-4"
+        >
+          <div className="space-y-4">
+            <div className="flex items-center justify-between gap-3">
+              <p className="font-label text-xs uppercase tracking-[0.22em] text-primary">New Members</p>
+              <Button
+                aria-label="Add Member"
+                type="button"
+                variant="secondary"
+                onClick={props.onAddMember}
+              >
+                Add Member
+              </Button>
+            </div>
+
+            <div className="grid gap-3">
+              {props.newMembers.map((member, index) => (
+                <MemberFieldRow
+                  key={`extend-member-${index + 1}`}
+                  canRemove={props.newMembers.length > 1}
+                  index={index}
+                  value={member}
+                  onChange={(value) => props.onUpdateMember(index, value)}
+                  onRemove={() => props.onRemoveMember(index)}
+                />
+              ))}
+            </div>
+          </div>
+        </FrameBracket>
+
+        {props.error ? (
+          <p className="font-body border border-danger/40 bg-danger/10 px-4 py-3 text-[12px] leading-relaxed text-danger">
+            {props.error}
+          </p>
+        ) : null}
+
+        <Button
+          aria-label="Add Members to Mission"
+          className="w-full"
+          disabled={props.isSubmitting || !props.asset || props.knownGameId.trim().length === 0 || props.knownPersonalKey.trim().length === 0}
+          type="submit"
+          variant="primary"
+        >
+          {props.isSubmitting ? 'Adding…' : 'Add Members'}
+        </Button>
+      </div>
+    </form>
   );
 }
 

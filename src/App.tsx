@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { AuthoringModal } from './authoring/AuthoringModal';
+import { extendMission } from './authoring/extendMission';
 import { generateMission } from './authoring/generateMission';
 import type { CommanderIdentity } from './authoring/identity';
 import { loadIdentity, saveIdentity } from './authoring/identity';
@@ -65,6 +66,7 @@ export function App() {
         open={authoringModalOpen}
         onClose={() => setAuthoringModalOpen(false)}
         onGenerate={generateMission}
+        onExtend={extendMission}
         identity={identity}
         onGenerateIdentity={handleGenerateIdentity}
       />
