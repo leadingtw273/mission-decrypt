@@ -47,13 +47,13 @@ export function App() {
   }
 
   return (
-    <main className="flex min-h-screen min-w-[768px] flex-col bg-bg-primary text-text font-body">
+    <main className="flex min-h-screen flex-col bg-bg-primary text-text font-body md:min-w-[768px]">
       <header className="border-b border-border p-4">
         <h1 className="font-display text-primary">STAR CITIZEN // FLEET COMMAND</h1>
         <p className="font-label text-text/70">SECURE COMMUNICATION PROTOCOL</p>
       </header>
 
-      <section className="mx-auto flex w-[70%] min-w-[768px] flex-1 flex-col justify-center py-8">
+      <section className="mx-auto flex w-full flex-1 flex-col justify-center md:w-[70%] md:min-w-[768px] md:py-8">
         {renderStateView(state, submit, retry)}
       </section>
 
