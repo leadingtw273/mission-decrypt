@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 
 import type { MissionAssetV1, MissionPlaintext } from '../crypto';
 import type { ClassificationLevel, DifficultyLevel, FieldName } from '../crypto/schema';
 import { AnimatedCipherText } from './shared/AnimatedCipherText';
+import { Button } from './shared/Button';
 import { FrameBracket } from './shared/FrameBracket';
 import { MissionBriefPanel } from './shared/MissionBriefPanel';
 import { ScannerSweep } from './shared/ScannerSweep';
@@ -32,12 +33,24 @@ const FIELD_SPECS: Array<{ name: FieldName; label: string }> = [
 ];
 
 const REVEAL_DURATION_MS = 8000;
-const FIELD_STAGGER_MS = REVEAL_DURATION_MS / FIELD_SPECS.length;
+const FIELD_REVEAL_FRACTION = 500 / REVEAL_DURATION_MS;
+const REQUIRED_GEAR_INDEX = FIELD_SPECS.findIndex((field) => field.name === 'requiredGear');
+const PAUSE_AT_FRACTION = REQUIRED_GEAR_INDEX / FIELD_SPECS.length;
+
+function fieldRevealProgress(overallProgress: number, fieldIndex: number): number {
+  const fieldStart = fieldIndex / FIELD_SPECS.length;
+  const span = FIELD_REVEAL_FRACTION;
+  return Math.max(0, Math.min(1, (overallProgress - fieldStart) / span));
+}
 
 export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
   const [heroImageUrl, setHeroImageUrl] = useState('');
   const [progress, setProgress] = useState(prefersReducedMotion ? 1 : 0);
+  const [paused, setPaused] = useState(false);
+  const acknowledgedRef = useRef(false);
+  const elapsedRef = useRef(0);
+  const isExtreme = mission.classification === 'extreme';
 
   useEffect(() => {
     const imageBuffer = heroImage.bytes.slice().buffer as ArrayBuffer;
@@ -54,20 +67,48 @@ export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps)
       setProgress(1);
       return;
     }
+    if (paused) return;
 
-    const start = performance.now();
+    let lastTime = performance.now();
     let raf = 0;
+    let cancelled = false;
+
     function tick() {
-      const elapsed = performance.now() - start;
-      const next = Math.min(1, elapsed / REVEAL_DURATION_MS);
+      if (cancelled) return;
+      const now = performance.now();
+      elapsedRef.current += now - lastTime;
+      lastTime = now;
+
+      const next = Math.min(1, elapsedRef.current / REVEAL_DURATION_MS);
+
+      if (isExtreme && !acknowledgedRef.current && next >= PAUSE_AT_FRACTION) {
+        elapsedRef.current = REVEAL_DURATION_MS * PAUSE_AT_FRACTION;
+        setProgress(PAUSE_AT_FRACTION);
+        setPaused(true);
+        return;
+      }
+
       setProgress(next);
       if (next < 1) {
         raf = window.requestAnimationFrame(tick);
       }
     }
+
     raf = window.requestAnimationFrame(tick);
-    return () => window.cancelAnimationFrame(raf);
-  }, [prefersReducedMotion]);
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(raf);
+    };
+  }, [paused, prefersReducedMotion, isExtreme]);
+
+  const handleContinueExtreme = () => {
+    acknowledgedRef.current = true;
+    setPaused(false);
+  };
+
+  const handleCancelReview = () => {
+    window.location.reload();
+  };
 
   const showImage = progress >= 1;
 
@@ -90,6 +131,11 @@ export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps)
                 initial={prefersReducedMotion ? false : { opacity: 0 }}
                 src={heroImageUrl}
                 transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.6, ease: 'easeOut' }}
+              />
+            ) : paused ? (
+              <ExtremeWarningPanel
+                onContinue={handleContinueExtreme}
+                onCancel={handleCancelReview}
               />
             ) : (
               <DecryptingScan />
@@ -133,7 +179,7 @@ export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps)
                     <AnimatedCipherText
                       mode="scramble-reveal"
                       sourceText={asset.fields[field.name].ciphertext}
-                      startDelayMs={index * FIELD_STAGGER_MS}
+                      progress={fieldRevealProgress(progress, index)}
                       text={displayValue}
                     />
                   </p>
@@ -144,6 +190,63 @@ export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps)
         </div>
       </div>
     </section>
+  );
+}
+
+function ExtremeWarningPanel({
+  onContinue,
+  onCancel,
+}: {
+  onContinue: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div className="flex h-full min-h-[20rem] w-full flex-col items-center justify-center gap-5 px-6 py-8 text-center xl:min-h-0">
+      <div className="flex items-center gap-3">
+        <span aria-hidden="true" className="font-display text-3xl text-red-500">⚠</span>
+        <span className="font-display text-base font-bold tracking-[0.28em] text-red-500 md:text-lg">
+          EXTREME CLASSIFICATION
+        </span>
+        <span aria-hidden="true" className="font-display text-3xl text-red-500">⚠</span>
+      </div>
+      <p className="font-body max-w-sm text-sm leading-relaxed text-text/85">
+        正在解密「<span className="font-display font-bold text-red-500">極</span>」機密任務內容
+      </p>
+      <ul className="font-body max-w-sm space-y-2 text-left text-xs leading-relaxed text-text/70">
+        <li className="flex gap-2">
+          <span aria-hidden="true" className="text-primary">›</span>
+          <span>嚴禁向任何第三方透露此任務內容。</span>
+        </li>
+        <li className="flex gap-2">
+          <span aria-hidden="true" className="text-primary">›</span>
+          <span>確認當前面板左右無其他人員後再繼續。</span>
+        </li>
+        <li className="flex gap-2">
+          <span aria-hidden="true" className="text-primary">›</span>
+          <span>違者按照團隊紀律處置。</span>
+        </li>
+      </ul>
+      <div className="mt-2 flex w-full max-w-sm flex-col gap-2 sm:flex-row">
+        <Button
+          aria-label="繼續解密"
+          className="flex-1"
+          type="button"
+          variant="primary"
+          onClick={onContinue}
+        >
+          繼續解密
+        </Button>
+        <Button
+          aria-label="取消檢閱"
+          className="flex-1"
+          type="button"
+          variant="secondary"
+          onClick={onCancel}
+        >
+          取消檢閱
+        </Button>
+      </div>
+    </div>
   );
 }
 

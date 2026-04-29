@@ -12,6 +12,13 @@ type AnimatedCipherTextProps = {
   mode: 'typewriter' | 'scramble-reveal';
   sourceText?: string;
   startDelayMs?: number;
+  /**
+   * If provided (scramble-reveal mode only), drive the reveal externally
+   * via a 0..1 progress value instead of the component's internal timer.
+   * Lets the parent freeze every field at once when an extreme-classification
+   * confirmation gate pauses the reveal mid-way.
+   */
+  progress?: number;
 };
 
 export function AnimatedCipherText({
@@ -20,9 +27,11 @@ export function AnimatedCipherText({
   mode,
   sourceText,
   startDelayMs = 0,
+  progress,
 }: AnimatedCipherTextProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
   const resolvedSourceText = sourceText ?? text;
+  const isExternallyControlled = mode === 'scramble-reveal' && progress !== undefined;
 
   const scrambleSeed = useMemo(
     () => `${resolvedSourceText}:${text}`,
@@ -40,6 +49,10 @@ export function AnimatedCipherText({
   useEffect(() => {
     if (prefersReducedMotion) {
       setFrame(text);
+      return;
+    }
+    if (isExternallyControlled) {
+      // Parent drives progress; skip the internal timer entirely.
       return;
     }
 
@@ -89,11 +102,20 @@ export function AnimatedCipherText({
       window.clearTimeout(startTimerId);
       if (intervalId !== null) window.clearInterval(intervalId);
     };
-  }, [mode, prefersReducedMotion, resolvedSourceText, scrambleSeed, startDelayMs, text]);
+  }, [isExternallyControlled, mode, prefersReducedMotion, resolvedSourceText, scrambleSeed, startDelayMs, text]);
+
+  const displayFrame = isExternallyControlled
+    ? buildScrambleFrame(
+        resolvedSourceText,
+        text,
+        prefersReducedMotion ? 1 : Math.max(0, Math.min(1, progress as number)),
+        scrambleSeed,
+      )
+    : frame;
 
   return (
     <span className={className} data-motion-mode={prefersReducedMotion ? 'reduced' : mode}>
-      {frame}
+      {displayFrame}
     </span>
   );
 }

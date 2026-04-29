@@ -16,7 +16,7 @@ const DEV_TEST_COMMANDER_PRIVATE_JWK: JsonWebKey = {
 };
 
 const exampleMission = {
-  classification: 'high',
+  classification: 'extreme',
   codename: 'Assault Horizon / 突襲地平線',
   difficulty: 'hard',
   missionCommander: '老周【leadingtw】',
