@@ -80,13 +80,13 @@ export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps)
           <FrameBracket
             size={28}
             color="primary"
-            className="w-full max-w-[320px] overflow-hidden border border-primary/30 bg-bg-primary/70 p-3 lg:h-full lg:max-w-none lg:p-0"
+            className="w-full max-w-[320px] overflow-hidden border border-primary/30 bg-bg-primary/70 bg-scan-stripes p-3 lg:h-full lg:max-w-none lg:p-0"
           >
             {showImage && heroImageUrl ? (
               <motion.img
                 alt={heroImage.altText}
                 animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1 }}
-                className="aspect-[4/5] w-full object-cover lg:aspect-auto lg:h-full"
+                className="aspect-[4/5] w-full object-contain lg:aspect-auto lg:h-full"
                 initial={prefersReducedMotion ? false : { opacity: 0 }}
                 src={heroImageUrl}
                 transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.6, ease: 'easeOut' }}
@@ -113,25 +113,56 @@ export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps)
             }
           />
 
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
-            {FIELD_SPECS.map((field, index) => (
-              <div key={field.name} className="border border-border bg-bg-primary/55 px-4 py-3">
-                <p className="font-label text-[11px] text-text/70">{field.label}</p>
-                <p className="font-body mt-2 whitespace-pre-wrap text-sm text-primary">
-                  <AnimatedCipherText
-                    mode="scramble-reveal"
-                    sourceText={asset.fields[field.name].ciphertext}
-                    startDelayMs={index * FIELD_STAGGER_MS}
-                    text={mission[field.name]}
-                  />
-                </p>
-              </div>
-            ))}
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+            {FIELD_SPECS.map((field, index) => {
+              const rawValue = mission[field.name];
+              const displayValue = field.name === 'rallyTime' ? formatRallyTime(rawValue) : rawValue;
+              const isBrief = field.name === 'missionBrief';
+              const bodyClassName = isBrief
+                ? 'font-body mt-2 max-h-[9rem] overflow-y-auto whitespace-pre-wrap pr-2 text-sm leading-6 text-primary'
+                : 'font-body mt-2 whitespace-pre-wrap text-sm text-primary';
+
+              return (
+                <div key={field.name} className="border border-border bg-bg-primary/55 px-4 py-2.5">
+                  <p className="font-label text-[11px] text-text/70">{field.label}</p>
+                  <p className={bodyClassName}>
+                    <AnimatedCipherText
+                      mode="scramble-reveal"
+                      sourceText={asset.fields[field.name].ciphertext}
+                      startDelayMs={index * FIELD_STAGGER_MS}
+                      text={displayValue}
+                    />
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
     </section>
   );
+}
+
+function formatRallyTime(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const hh = String(date.getHours()).padStart(2, '0');
+  const min = String(date.getMinutes()).padStart(2, '0');
+
+  const offsetMinutes = -date.getTimezoneOffset();
+  const sign = offsetMinutes >= 0 ? '+' : '-';
+  const absOffset = Math.abs(offsetMinutes);
+  const offsetH = Math.floor(absOffset / 60);
+  const offsetM = absOffset % 60;
+  const offsetStr = offsetM > 0
+    ? `GMT${sign}${offsetH}:${String(offsetM).padStart(2, '0')}`
+    : `GMT${sign}${offsetH}`;
+
+  return `${yyyy}-${mm}-${dd} ${hh}:${min} (${offsetStr})`;
 }
 
 function DecryptingScan() {

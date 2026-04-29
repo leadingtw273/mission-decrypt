@@ -155,7 +155,7 @@ function CodenameBlock({
       <div className="flex w-full min-w-0 flex-col items-center gap-1 text-center">
         <span className="font-label text-[10px] tracking-[0.32em] text-text/55">CODENAME</span>
         <span
-          className={`font-display block w-full break-words text-lg font-bold leading-tight tracking-[0.1em] md:text-xl lg:text-2xl lg:tracking-[0.14em] ${isLocked ? 'text-text/35' : 'text-primary'}`}
+          className={`font-display block w-full break-words text-lg font-bold leading-tight tracking-[0.1em] md:text-xl lg:text-2xl lg:tracking-[0.14em] ${isLocked ? 'text-text/35' : 'text-orange-400'}`}
         >
           {en ?? '— — — —'}
         </span>
@@ -316,7 +316,7 @@ function DecryptingOverlay({ progress }: { progress: number }) {
         <div className="flex-1">
           <ProgressBar progress={progress} />
         </div>
-        <span className="font-display flex-shrink-0 text-base tracking-[0.1em] text-primary">
+        <span className="font-display w-16 flex-shrink-0 text-right text-base tabular-nums tracking-[0.05em] text-primary">
           {String(Math.round(progress * 100)).padStart(3, '0')}%
         </span>
         <span aria-hidden="true" className="font-display flex-shrink-0 text-primary">

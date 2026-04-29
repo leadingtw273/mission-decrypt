@@ -7,6 +7,7 @@ import { Button } from './shared/Button';
 import { FrameBracket } from './shared/FrameBracket';
 import { Input } from './shared/Input';
 import { MissionBriefPanel } from './shared/MissionBriefPanel';
+import { buildScrambleFrame } from './shared/scramble';
 
 type LockedViewProps = {
   asset: MissionAssetV1;
@@ -26,12 +27,6 @@ const FIELD_SPECS: Array<{ name: FieldName; label: string; length: number }> = [
   { name: 'missionBrief', label: 'MISSION BRIEF', length: 50 },
 ];
 
-const SYMBOLS = `%$@!#^&*()_+[]{};'\"<>?/~`;
-const BASE64URL_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-';
-
-const GIBBERISH_MAP = new Map(
-  Array.from(BASE64URL_ALPHABET, (char, index) => [char, SYMBOLS[index % SYMBOLS.length]]),
-);
 
 export function LockedView({ asset, onSubmit, submitting }: LockedViewProps) {
   const gameIdInputId = useId();
@@ -50,7 +45,7 @@ export function LockedView({ asset, onSubmit, submitting }: LockedViewProps) {
         <FrameBracket
           size={28}
           color="primary"
-          className="border border-primary/30 bg-bg-primary/70 p-6 lg:h-full lg:p-8"
+          className="border border-primary/30 bg-bg-primary/70 bg-scan-stripes p-6 lg:h-full lg:p-8"
         >
           <div className="flex w-full flex-col gap-6">
             <div className="flex flex-col items-center justify-center gap-4">
@@ -133,11 +128,11 @@ export function LockedView({ asset, onSubmit, submitting }: LockedViewProps) {
 }
 
 export function toGibberish(b64url: string, length: number): string {
-  return b64url
-    .slice(0, length)
-    .split('')
-    .map((char) => GIBBERISH_MAP.get(char) ?? SYMBOLS[char.charCodeAt(0) % SYMBOLS.length])
-    .join('');
+  // Use the same scramble alphabet/algorithm as AnimatedCipherText so the
+  // pre-decrypt placeholder is visually continuous with the initial frame
+  // of the decrypting reveal animation.
+  const target = b64url.slice(0, length);
+  return buildScrambleFrame(b64url, target, 0, b64url);
 }
 
 function LockIcon() {

@@ -154,8 +154,8 @@ describe('LockedView', () => {
   });
 
   it('maps the same ciphertext to the same gibberish deterministically', () => {
-    expect(toGibberish('AbCdEf123_-', 18)).toBe(toGibberish('AbCdEf123_-', 18));
-    expect(toGibberish('AbCdEf123_-', 18)).toMatch(/^[%$@!#^&*()_+\[\]{};'\"<>?\/~]+$/);
+    expect(toGibberish('AbCdEf123_-', 11)).toBe(toGibberish('AbCdEf123_-', 11));
+    expect(toGibberish('AbCdEf123_-', 11)).toMatch(/^[A-Z0-9_\-/%$@!#^&*]+$/);
   });
 });
 

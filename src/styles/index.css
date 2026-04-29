@@ -68,6 +68,16 @@
   border-color: var(--color-primary);
 }
 
+@utility bg-scan-stripes {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0,
+    transparent 7px,
+    rgba(255, 186, 0, 0.05) 7px,
+    rgba(255, 186, 0, 0.05) 8px
+  );
+}
+
 .font-display {
   font-family: var(--font-display);
   letter-spacing: var(--tracking-display);
