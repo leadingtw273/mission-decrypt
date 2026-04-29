@@ -590,7 +590,10 @@ function AuthoringStage(props: {
 }) {
   return (
     <form className="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]" onSubmit={props.onSubmit}>
-      <div className="grid gap-x-4 gap-y-3 md:grid-cols-2">
+      {/* md+ uses CSS subgrid: each field becomes a 3-row block (label / helper / input)
+        so adjacent columns share row tracks and inputs always align even when one
+        column's helper wraps to 2 lines or is absent. */}
+      <div className="grid gap-y-3 md:grid-cols-2 md:gap-x-4 md:[grid-auto-rows:auto]">
         {MISSION_FIELDS.map((field) => (
           <MissionFieldControl
             key={field.name}
@@ -683,11 +686,19 @@ function MissionFieldControl(props: {
   const kind = field.kind ?? 'text';
 
   return (
-    <label className={`space-y-1 ${field.fullWidth ? 'md:col-span-2' : ''}`} htmlFor={id}>
+    <label
+      className={`space-y-1 md:grid md:grid-rows-subgrid md:row-span-3 md:gap-y-1 md:space-y-0 ${field.fullWidth ? 'md:col-span-2' : ''}`}
+      htmlFor={id}
+    >
       <span className="font-label block text-xs uppercase tracking-[0.22em] text-text/72">{field.label}</span>
-      {field.helper ? (
-        <span className="font-body block text-[10px] leading-tight text-text/70">{field.helper}</span>
-      ) : null}
+      {/* Helper slot is always rendered on md+ (with a non-breaking space when
+        empty) so the subgrid row track lines up even if a paired field has no
+        helper or wraps to a different number of lines. */}
+      <span
+        className={`font-body text-[10px] leading-tight text-text/70 ${field.helper ? 'block' : 'hidden md:block'}`}
+      >
+        {field.helper ?? ' '}
+      </span>
       {kind === 'multiline' ? (
         <textarea
           aria-label={field.label}
