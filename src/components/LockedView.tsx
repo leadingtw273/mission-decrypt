@@ -46,26 +46,25 @@ export function LockedView({ asset, onSubmit, submitting }: LockedViewProps) {
 
   return (
     <section className="border border-border bg-bg-secondary/60 px-6 py-8 shadow-[0_0_40px_rgba(255,186,0,0.06)] md:px-8">
-      <div className="grid gap-8 lg:grid-cols-2">
-        <div className="flex flex-col gap-8 lg:justify-center">
-          <div className="flex flex-col items-center justify-center gap-5">
-            <FrameBracket
-              size={26}
-              color="primary"
-              className="w-full max-w-[280px] border border-primary/30 bg-bg-primary/70 px-8 py-10"
-            >
+      <div className="grid gap-8 lg:grid-cols-2 lg:items-stretch">
+        <FrameBracket
+          size={28}
+          color="primary"
+          className="border border-primary/30 bg-bg-primary/70 p-6 lg:h-full lg:p-8"
+        >
+          <div className="flex w-full flex-col gap-6">
+            <div className="flex flex-col items-center justify-center gap-4">
               <LockIcon />
-            </FrameBracket>
-            <div className="font-label flex items-center gap-2 text-sm text-primary">
-              <span>ACCESS LOCKED</span>
-              <span aria-hidden="true" className="inline-block h-4 w-px bg-primary motion-safe:animate-pulse" />
+              <div className="font-label flex items-center gap-2 text-sm text-primary">
+                <span>ACCESS LOCKED</span>
+                <span aria-hidden="true" className="inline-block h-4 w-px bg-primary motion-safe:animate-pulse" />
+              </div>
+              <p className="font-body text-center text-sm text-text/70">
+                Mission asset <span className="font-label text-primary">{asset.missionId}</span> requires verified operator credentials.
+              </p>
             </div>
-            <p className="font-body text-center text-sm text-text/70">
-              Mission asset <span className="font-label text-primary">{asset.missionId}</span> requires verified operator credentials.
-            </p>
-          </div>
 
-          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+            <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <label className="font-label text-xs text-text/70" htmlFor={gameIdInputId}>
                 Game ID
@@ -109,7 +108,8 @@ export function LockedView({ asset, onSubmit, submitting }: LockedViewProps) {
               START DECRYPTION
             </Button>
           </form>
-        </div>
+          </div>
+        </FrameBracket>
 
         <div className="flex flex-col gap-4">
           <MissionBriefPanel state={{ kind: 'locked', missionId: asset.missionId }} />
