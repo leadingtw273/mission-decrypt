@@ -6,6 +6,7 @@ import { generateMission } from './authoring/generateMission';
 import type { CommanderIdentity } from './authoring/identity';
 import { loadIdentity, saveIdentity } from './authoring/identity';
 import { DecryptedView } from './components/DecryptedView';
+import { ErrorModal } from './components/ErrorModal';
 import { ErrorView } from './components/ErrorView';
 import { LockedView } from './components/LockedView';
 import { generateSigningKeypair } from './crypto/sign';
@@ -90,6 +91,18 @@ function renderStateView(
     case 'DECRYPTED':
       return <DecryptedView asset={state.asset} mission={state.mission} heroImage={state.heroImage} />;
     case 'ERROR':
+      // Retryable errors that still hold a parsed asset stay on top of the
+      // form (so the user keeps the credentials they typed) and surface the
+      // failure via a blurred-backdrop modal. Other errors (no asset, fatal
+      // signature/verification failures) fall through to the full-page view.
+      if (state.retryable && state.lastAsset) {
+        return (
+          <div className="relative">
+            <LockedView asset={state.lastAsset} onSubmit={submit} submitting={false} />
+            <ErrorModal reason={state.reason} onRetry={retry} />
+          </div>
+        );
+      }
       return state.retryable ? (
         <ErrorView reason={state.reason} retryable={state.retryable} onRetry={retry} />
       ) : (
