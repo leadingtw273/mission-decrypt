@@ -75,18 +75,18 @@ export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps)
     <section className="relative overflow-hidden border border-border bg-bg-secondary/60 px-6 py-8 shadow-[0_0_40px_rgba(255,186,0,0.06)] md:px-8">
       {!showImage ? <ScannerSweep /> : null}
 
-      <div className="relative z-10 grid gap-8 lg:grid-cols-2 lg:items-stretch">
-        <div className="w-full lg:h-full">
+      <div className="relative z-10 grid gap-8 xl:grid-cols-2 xl:items-stretch">
+        <div className="w-full xl:h-full">
           <FrameBracket
             size={28}
             color="primary"
-            className="w-full overflow-hidden border border-primary/30 bg-bg-primary/70 bg-scan-stripes p-3 lg:h-full lg:p-0"
+            className="w-full overflow-hidden border border-primary/30 bg-bg-primary/70 bg-scan-stripes p-3 xl:h-full xl:p-0"
           >
             {showImage && heroImageUrl ? (
               <motion.img
                 alt={heroImage.altText}
                 animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1 }}
-                className="aspect-video w-full object-contain md:aspect-[4/5] lg:aspect-auto lg:h-full"
+                className="aspect-video w-full object-contain md:aspect-[4/5] xl:aspect-auto xl:h-full"
                 initial={prefersReducedMotion ? false : { opacity: 0 }}
                 src={heroImageUrl}
                 transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.6, ease: 'easeOut' }}
@@ -113,15 +113,15 @@ export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps)
             }
           />
 
-          <div className="grid gap-3 lg:grid-cols-2">
+          <div className="grid gap-3 xl:grid-cols-2">
             {FIELD_SPECS.map((field, index) => {
               const rawValue = mission[field.name];
               const displayValue = field.name === 'rallyTime' ? formatRallyTime(rawValue) : rawValue;
               const isBrief = field.name === 'missionBrief';
               const isFullWidth = isBrief || field.name === 'accessPermission' || field.name === 'rewardDistribution';
               const cardClassName = isBrief
-                ? 'flex h-[10.5rem] flex-col border border-border bg-bg-primary/55 px-4 py-2.5 lg:col-span-2'
-                : `flex h-16 flex-col justify-center border border-border bg-bg-primary/55 px-4 ${isFullWidth ? 'lg:col-span-2' : ''}`;
+                ? 'flex h-[10.5rem] flex-col border border-border bg-bg-primary/55 px-4 py-2.5 xl:col-span-2'
+                : `flex h-16 flex-col justify-center border border-border bg-bg-primary/55 px-4 ${isFullWidth ? 'xl:col-span-2' : ''}`;
               const bodyClassName = isBrief
                 ? 'font-body mt-2 flex-1 overflow-y-auto whitespace-pre-wrap pr-2 text-sm leading-6 text-primary'
                 : 'font-body mt-1 truncate whitespace-nowrap text-sm text-primary';
@@ -175,7 +175,7 @@ function DecryptingScan() {
   return (
     <div
       aria-hidden="true"
-      className="flex h-full min-h-[16rem] w-full flex-col items-center justify-center gap-4 bg-bg-primary/30 lg:min-h-0"
+      className="flex h-full min-h-[16rem] w-full flex-col items-center justify-center gap-4 bg-bg-primary/30 xl:min-h-0"
     >
       <motion.div
         animate={prefersReducedMotion ? { rotate: 0, scale: 1 } : { rotate: 360 }}

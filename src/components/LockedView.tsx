@@ -41,11 +41,11 @@ export function LockedView({ asset, onSubmit, submitting }: LockedViewProps) {
 
   return (
     <section className="border border-border bg-bg-secondary/60 px-6 py-8 shadow-[0_0_40px_rgba(255,186,0,0.06)] md:px-8">
-      <div className="grid gap-8 lg:grid-cols-2 lg:items-stretch">
+      <div className="grid gap-8 xl:grid-cols-2 xl:items-stretch">
         <FrameBracket
           size={28}
           color="primary"
-          className="border border-primary/30 bg-bg-primary/70 bg-scan-stripes p-6 lg:h-full lg:p-8"
+          className="border border-primary/30 bg-bg-primary/70 bg-scan-stripes p-6 xl:h-full xl:p-8"
         >
           <div className="flex w-full flex-col gap-6">
             <div className="flex flex-col items-center justify-center gap-4">
@@ -108,13 +108,13 @@ export function LockedView({ asset, onSubmit, submitting }: LockedViewProps) {
 
         <div className="flex flex-col gap-4">
           <MissionBriefPanel state={{ kind: 'locked', missionId: asset.missionId }} />
-          <div className="grid gap-3 lg:grid-cols-2">
+          <div className="grid gap-3 xl:grid-cols-2">
             {FIELD_SPECS.map((field) => {
               const isBrief = field.name === 'missionBrief';
               const isFullWidth = isBrief || field.name === 'accessPermission' || field.name === 'rewardDistribution';
               const cardClassName = isBrief
-                ? 'flex h-[10.5rem] flex-col border border-border bg-bg-primary/55 px-4 py-2.5 lg:col-span-2'
-                : `flex h-16 flex-col justify-center border border-border bg-bg-primary/55 px-4 ${isFullWidth ? 'lg:col-span-2' : ''}`;
+                ? 'flex h-[10.5rem] flex-col border border-border bg-bg-primary/55 px-4 py-2.5 xl:col-span-2'
+                : `flex h-16 flex-col justify-center border border-border bg-bg-primary/55 px-4 ${isFullWidth ? 'xl:col-span-2' : ''}`;
               const bodyClassName = isBrief
                 ? 'font-body mt-2 flex-1 overflow-y-auto whitespace-pre-wrap break-all pr-2 text-sm leading-6 text-primary'
                 : 'font-body mt-1 truncate whitespace-nowrap text-sm text-primary';
