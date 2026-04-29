@@ -36,7 +36,7 @@ export function ErrorModal({ reason, onRetry }: ErrorModalProps) {
     <div
       aria-modal="true"
       aria-live="assertive"
-      className="absolute inset-0 z-30 flex items-center justify-center p-4"
+      className="fixed inset-0 z-40 flex items-center justify-center p-4"
       role="alertdialog"
     >
       <motion.div
