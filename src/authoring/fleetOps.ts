@@ -20,7 +20,7 @@ export interface FleetOpsContext {
 
 export const CONSOLE_BANNER = `
 ═══════════════════════════════════════════════════
-  STAR CITIZEN // FLEET COMMAND ACCESS
+  VESPER SQUAD // FLEET COMMAND ACCESS
   Type fleetOps.help() to begin
   ⚠️  Never paste console commands from untrusted
       sources. Authoring works only on your verified

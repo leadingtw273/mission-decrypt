@@ -51,8 +51,18 @@ export function App() {
   return (
     <main className="flex min-h-screen flex-col bg-bg-primary text-text font-body md:min-w-[768px]">
       <header className="border-b border-border p-4">
-        <h1 className="font-display text-primary">STAR CITIZEN // FLEET COMMAND</h1>
-        <p className="font-label text-text/70">SECURE COMMUNICATION PROTOCOL</p>
+        <div className="flex items-center gap-3">
+          <img
+            alt=""
+            aria-hidden="true"
+            className="h-12 w-12 shrink-0 object-contain md:h-14 md:w-14"
+            src={`${import.meta.env.BASE_URL}vesper-squad-logo.png`}
+          />
+          <div>
+            <h1 className="font-display text-primary">VESPER SQUAD // FLEET COMMAND</h1>
+            <p className="font-label text-text/70">SECURE COMMUNICATION PROTOCOL</p>
+          </div>
+        </div>
       </header>
 
       <section className="mx-auto flex w-full flex-1 flex-col justify-center md:w-[70%] md:min-w-[768px] md:py-8">

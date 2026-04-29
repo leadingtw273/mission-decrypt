@@ -133,7 +133,7 @@ describe('App', () => {
   it('renders header and footer chrome', () => {
     render(<App />);
 
-    expect(screen.getByRole('heading', { name: 'STAR CITIZEN // FLEET COMMAND' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'VESPER SQUAD // FLEET COMMAND' })).toBeInTheDocument();
     expect(screen.getByText('SECURE COMMUNICATION PROTOCOL')).toBeInTheDocument();
     expect(screen.getByText('FLEET COMMAND // VERSION 1.0.0')).toBeInTheDocument();
   });
