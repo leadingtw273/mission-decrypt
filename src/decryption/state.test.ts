@@ -27,6 +27,8 @@ const sampleAsset: MissionAssetV1 = {
   },
   fields: {
     classification: { iv: 'i', ciphertext: 'c' },
+    codename: { iv: 'i', ciphertext: 'c' },
+    difficulty: { iv: 'i', ciphertext: 'c' },
     missionCommander: { iv: 'i', ciphertext: 'c' },
     communicationChannel: { iv: 'i', ciphertext: 'c' },
     missionTime: { iv: 'i', ciphertext: 'c' },
@@ -55,6 +57,8 @@ const sampleAsset: MissionAssetV1 = {
 
 const sampleMission: MissionPlaintext = {
   classification: 'high',
+  codename: 'TEST OP / 測試任務',
+  difficulty: 'normal',
   missionCommander: 'Lt. Zhou [leadingtw]',
   communicationChannel: 'Strategy Channel > Deep Space',
   missionTime: '22:00 - 24:00 (GMT+8)',

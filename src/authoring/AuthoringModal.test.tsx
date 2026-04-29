@@ -47,6 +47,8 @@ const sampleResult: GenerateMissionResult = {
     wrappedKeys: {},
     fields: {
       classification: { iv: 'a', ciphertext: 'b' },
+      codename: { iv: 'a', ciphertext: 'b' },
+      difficulty: { iv: 'a', ciphertext: 'b' },
       missionCommander: { iv: 'a', ciphertext: 'b' },
       communicationChannel: { iv: 'a', ciphertext: 'b' },
       missionTime: { iv: 'a', ciphertext: 'b' },

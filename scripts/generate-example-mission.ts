@@ -17,6 +17,8 @@ const DEV_TEST_COMMANDER_PRIVATE_JWK: JsonWebKey = {
 
 const exampleMission = {
   classification: 'high',
+  codename: 'DEEP SPACE HUNT / 深空狩獵',
+  difficulty: 'hard',
   missionCommander: '老周【leadingtw】',
   communicationChannel: '戰略頻道 > 星際遨遊',
   missionTime: '2H',

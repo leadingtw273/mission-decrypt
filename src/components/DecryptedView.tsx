@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 import type { MissionAssetV1, MissionPlaintext } from '../crypto';
-import type { ClassificationLevel, FieldName } from '../crypto/schema';
+import type { ClassificationLevel, DifficultyLevel, FieldName } from '../crypto/schema';
 import { AnimatedCipherText } from './shared/AnimatedCipherText';
 import { FrameBracket } from './shared/FrameBracket';
-import { MissionHeaderBar } from './shared/MissionHeaderBar';
+import { MissionBriefPanel } from './shared/MissionBriefPanel';
 import { ScannerSweep } from './shared/ScannerSweep';
 import { usePrefersReducedMotion } from './shared/usePrefersReducedMotion';
 
@@ -98,15 +98,18 @@ export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps)
         </div>
 
         <div className="flex flex-col gap-4">
-          <MissionHeaderBar
+          <MissionBriefPanel
             state={
               showImage
                 ? {
                     kind: 'decrypted',
+                    missionId: asset.missionId,
                     classification: mission.classification as ClassificationLevel,
+                    codename: mission.codename,
+                    difficulty: mission.difficulty as DifficultyLevel,
                     rallyTimeIso: mission.rallyTime,
                   }
-                : { kind: 'decrypting', progress }
+                : { kind: 'decrypting', progress, missionId: asset.missionId }
             }
           />
 

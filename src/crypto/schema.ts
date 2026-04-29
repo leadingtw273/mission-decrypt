@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 export const FIELD_NAMES = [
   'classification',
+  'codename',
+  'difficulty',
   'missionCommander',
   'communicationChannel',
   'missionTime',
@@ -17,6 +19,9 @@ export type FieldName = (typeof FIELD_NAMES)[number];
 
 export const CLASSIFICATION_VALUES = ['extreme', 'high', 'low'] as const;
 export type ClassificationLevel = (typeof CLASSIFICATION_VALUES)[number];
+
+export const DIFFICULTY_VALUES = ['low', 'normal', 'hard', 'extreme', 'suicide'] as const;
+export type DifficultyLevel = (typeof DIFFICULTY_VALUES)[number];
 
 const MISSION_ID_PATTERN = /^[A-Z]{3}-[A-Z0-9]{5}-[A-Z]{2}[0-9]$/;
 

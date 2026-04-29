@@ -4,6 +4,8 @@ import { generateSigningKeypair, exportPublicKey, importPublicKey } from './sign
 
 const samplePlaintext = {
   classification: 'high',
+  codename: 'TEST OP / 測試任務',
+  difficulty: 'normal',
   missionCommander: 'Lt. Zhou [leadingtw]',
   communicationChannel: 'Strategy Channel > Deep Space',
   missionTime: '22:00 - 24:00 (GMT+8)',

@@ -31,6 +31,8 @@ type MissionFormState = Record<MissionFieldName, string>;
 
 type MissionFieldName =
   | 'classification'
+  | 'codename'
+  | 'difficulty'
   | 'missionCommander'
   | 'communicationChannel'
   | 'missionTime'
@@ -62,6 +64,23 @@ const MISSION_FIELDS: MissionFieldDef[] = [
       { value: 'low', label: 'LOW (低) — 不可未經授權對外公開內容' },
     ],
   },
+  {
+    name: 'codename',
+    label: 'Operation Codename',
+    placeholder: 'DEEP SPACE HUNT / 深空狩獵',
+  },
+  {
+    name: 'difficulty',
+    label: 'Difficulty',
+    kind: 'select',
+    options: [
+      { value: 'low', label: '低 (LOW)' },
+      { value: 'normal', label: '一般 (NORMAL)' },
+      { value: 'hard', label: '困難 (HARD)' },
+      { value: 'extreme', label: '極限 (EXTREME)' },
+      { value: 'suicide', label: '自殺式 (SUICIDE)' },
+    ],
+  },
   { name: 'missionCommander', label: 'Mission Commander' },
   { name: 'communicationChannel', label: 'Communication Channel' },
   { name: 'missionTime', label: 'Estimated Duration', placeholder: 'e.g. 1H, 30M, 2H30M' },
@@ -75,6 +94,8 @@ const MISSION_FIELDS: MissionFieldDef[] = [
 
 const EMPTY_FORM: MissionFormState = {
   classification: 'high',
+  codename: '',
+  difficulty: 'normal',
   missionCommander: '',
   communicationChannel: '',
   missionTime: '',
@@ -127,8 +148,8 @@ export function AuthoringModal({
       || heroImage !== null
       || members.some((member) => member.trim().length > 0)
       || Object.entries(mission).some(([key, value]) => {
-        if (key === 'classification') {
-          return value !== EMPTY_FORM.classification;
+        if (key === 'classification' || key === 'difficulty') {
+          return value !== EMPTY_FORM[key as MissionFieldName];
         }
         return value.trim().length > 0;
       }),

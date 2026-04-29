@@ -6,7 +6,7 @@ import { AnimatedCipherText } from './shared/AnimatedCipherText';
 import { Button } from './shared/Button';
 import { FrameBracket } from './shared/FrameBracket';
 import { Input } from './shared/Input';
-import { MissionHeaderBar } from './shared/MissionHeaderBar';
+import { MissionBriefPanel } from './shared/MissionBriefPanel';
 
 type LockedViewProps = {
   asset: MissionAssetV1;
@@ -112,7 +112,7 @@ export function LockedView({ asset, onSubmit, submitting }: LockedViewProps) {
         </div>
 
         <div className="flex flex-col gap-4">
-          <MissionHeaderBar state={{ kind: 'locked' }} />
+          <MissionBriefPanel state={{ kind: 'locked', missionId: asset.missionId }} />
           <div className="grid gap-4">
             {FIELD_SPECS.map((field) => (
               <div key={field.name} className="border border-border bg-bg-primary/55 px-4 py-3">

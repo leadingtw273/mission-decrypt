@@ -27,6 +27,8 @@ const validAsset = {
   },
   fields: {
     classification: { iv: 'i', ciphertext: 'c' },
+    codename: { iv: 'i', ciphertext: 'c' },
+    difficulty: { iv: 'i', ciphertext: 'c' },
     missionCommander: { iv: 'i', ciphertext: 'c' },
     communicationChannel: { iv: 'i', ciphertext: 'c' },
     missionTime: { iv: 'i', ciphertext: 'c' },
@@ -76,9 +78,11 @@ describe('MissionAssetV1 schema', () => {
 });
 
 describe('MissionPlaintextSchema', () => {
-  it('accepts all 10 fields with strings', () => {
+  it('accepts all 12 fields with strings', () => {
     expect(() => MissionPlaintextSchema.parse({
       classification: 'high',
+      codename: 'TEST OP / 測試任務',
+      difficulty: 'normal',
       missionCommander: 'a', communicationChannel: 'b', missionTime: 'c',
       rallyTime: 'd', rallyLocation: 'e', requiredGear: 'f',
       accessPermission: 'g', rewardDistribution: 'h', missionBrief: 'i',

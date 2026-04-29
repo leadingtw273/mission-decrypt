@@ -32,6 +32,8 @@ const sampleAsset: MissionAssetV1 = {
   },
   fields: {
     classification: { iv: 'iv00', ciphertext: 'ClassificationCipher01234_-ClassCipher' },
+    codename: { iv: 'iv00', ciphertext: 'ClassificationCipher01234_-ClassCipher' },
+    difficulty: { iv: 'iv00', ciphertext: 'ClassificationCipher01234_-ClassCipher' },
     missionCommander: { iv: 'iv01', ciphertext: 'AbCdEfGhIjKlMnOpQrStUvWxYz01_-' },
     communicationChannel: { iv: 'iv02', ciphertext: 'zYxWvUtSrQpOnMlKjIhGfEdCbA10_-' },
     missionTime: { iv: 'iv03', ciphertext: 'TimeCipher12345_-TimeCipher12345_-' },
@@ -60,6 +62,8 @@ const sampleAsset: MissionAssetV1 = {
 
 const sampleMission: MissionPlaintext = {
   classification: 'high',
+  codename: 'TEST OP / 測試任務',
+  difficulty: 'normal',
   missionCommander: 'Commander Lyra Voss',
   communicationChannel: 'VHF-7 encrypted relay',
   missionTime: '23:40 UTC',

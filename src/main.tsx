@@ -25,6 +25,8 @@ if (new URLSearchParams(location.search).has('cross-browser-harness')) {
         const { asset, links } = await encryptMission({
           mission: {
             classification: 'high',
+            codename: 'HARNESS / 測試',
+            difficulty: 'normal',
             missionCommander: 'Test', communicationChannel: 'X', missionTime: 'Y',
             rallyTime: 'Z', rallyLocation: 'W', requiredGear: 'V',
             accessPermission: 'U', rewardDistribution: 'T', missionBrief: 'S',
