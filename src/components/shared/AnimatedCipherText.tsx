@@ -11,6 +11,7 @@ type AnimatedCipherTextProps = {
   className?: string;
   mode: 'typewriter' | 'scramble-reveal';
   sourceText?: string;
+  startDelayMs?: number;
 };
 
 export function AnimatedCipherText({
@@ -18,9 +19,9 @@ export function AnimatedCipherText({
   className,
   mode,
   sourceText,
+  startDelayMs = 0,
 }: AnimatedCipherTextProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
-  const [frame, setFrame] = useState(text);
   const resolvedSourceText = sourceText ?? text;
 
   const scrambleSeed = useMemo(
@@ -28,56 +29,67 @@ export function AnimatedCipherText({
     [resolvedSourceText, text],
   );
 
+  const [frame, setFrame] = useState(() => {
+    if (prefersReducedMotion) return text;
+    if (mode === 'scramble-reveal') {
+      return buildScrambleFrame(resolvedSourceText, text, 0, scrambleSeed);
+    }
+    return text;
+  });
+
   useEffect(() => {
     if (prefersReducedMotion) {
       setFrame(text);
       return;
     }
 
-    if (mode === 'typewriter') {
-      setFrame('');
+    let intervalId: number | null = null;
 
-      let visibleCharacters = 0;
-      const intervalId = window.setInterval(() => {
-        visibleCharacters += 1;
-        if (visibleCharacters >= text.length) {
-          setFrame(text);
-          window.clearInterval(intervalId);
-          return;
-        }
-        setFrame(text.slice(0, visibleCharacters));
-      }, TYPEWRITER_INTERVAL_MS);
+    const startTimerId = window.setTimeout(() => {
+      if (mode === 'typewriter') {
+        setFrame('');
 
-      return () => {
-        window.clearInterval(intervalId);
-      };
-    }
+        let visibleCharacters = 0;
+        intervalId = window.setInterval(() => {
+          visibleCharacters += 1;
+          if (visibleCharacters >= text.length) {
+            setFrame(text);
+            if (intervalId !== null) window.clearInterval(intervalId);
+            return;
+          }
+          setFrame(text.slice(0, visibleCharacters));
+        }, TYPEWRITER_INTERVAL_MS);
 
-    let elapsed = 0;
-    setFrame(buildScrambleFrame(resolvedSourceText, text, 0, scrambleSeed));
-
-    const intervalId = window.setInterval(() => {
-      elapsed += SCRAMBLE_TICK_MS;
-      if (elapsed >= SCRAMBLE_TOTAL_MS) {
-        setFrame(text);
-        window.clearInterval(intervalId);
         return;
       }
 
-      setFrame(
-        buildScrambleFrame(
-          resolvedSourceText,
-          text,
-          elapsed / SCRAMBLE_TOTAL_MS,
-          scrambleSeed,
-        ),
-      );
-    }, SCRAMBLE_TICK_MS);
+      let elapsed = 0;
+      setFrame(buildScrambleFrame(resolvedSourceText, text, 0, scrambleSeed));
+
+      intervalId = window.setInterval(() => {
+        elapsed += SCRAMBLE_TICK_MS;
+        if (elapsed >= SCRAMBLE_TOTAL_MS) {
+          setFrame(text);
+          if (intervalId !== null) window.clearInterval(intervalId);
+          return;
+        }
+
+        setFrame(
+          buildScrambleFrame(
+            resolvedSourceText,
+            text,
+            elapsed / SCRAMBLE_TOTAL_MS,
+            scrambleSeed,
+          ),
+        );
+      }, SCRAMBLE_TICK_MS);
+    }, startDelayMs);
 
     return () => {
-      window.clearInterval(intervalId);
+      window.clearTimeout(startTimerId);
+      if (intervalId !== null) window.clearInterval(intervalId);
     };
-  }, [mode, prefersReducedMotion, resolvedSourceText, scrambleSeed, text]);
+  }, [mode, prefersReducedMotion, resolvedSourceText, scrambleSeed, startDelayMs, text]);
 
   return (
     <span className={className} data-motion-mode={prefersReducedMotion ? 'reduced' : mode}>
