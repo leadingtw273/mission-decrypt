@@ -83,7 +83,9 @@ function RestingBar({
       transition={{ duration: prefersReducedMotion ? 0 : 0.4 }}
     >
       <ClassificationBlock classification={classification} />
-      {isUnknown ? <StandbyDecoration /> : <span aria-hidden="true" className="flex-1" />}
+      <div className="flex flex-1 justify-center" aria-hidden="true">
+        {isUnknown ? <StandbyDecoration /> : null}
+      </div>
       <CountdownLcd rallyTimeIso={rallyTimeIso} />
     </motion.div>
   );
@@ -101,12 +103,12 @@ function ClassificationBlock({
       <span className="font-label text-[10px] tracking-[0.32em] text-text/55">CLASSIFICATION</span>
       <div className="flex items-center gap-3">
         <div
-          className={`font-display flex h-9 min-w-[5.5rem] items-center justify-center border px-3 text-base font-bold tracking-[0.22em] ${CLASSIFICATION_COLOR[classification]}`}
+          className={`font-display flex h-9 min-w-[4.5rem] items-center justify-center border px-3 text-sm font-bold tracking-[0.18em] md:min-w-[5.5rem] md:text-base md:tracking-[0.22em] ${CLASSIFICATION_COLOR[classification]}`}
         >
           {CLASSIFICATION_LABEL[classification]}
         </div>
         {description ? (
-          <span className="font-label whitespace-nowrap text-[11px] tracking-[0.12em] text-text/55">
+          <span className="font-label hidden whitespace-nowrap text-[11px] tracking-[0.12em] text-text/55 md:inline">
             {description}
           </span>
         ) : null}
@@ -122,7 +124,7 @@ function StandbyDecoration() {
     <motion.span
       animate={prefersReducedMotion ? { opacity: 0.7 } : { opacity: [0.35, 0.85, 0.35] }}
       aria-hidden="true"
-      className="font-label flex-1 text-center text-[11px] tracking-[0.4em] text-primary/70"
+      className="font-label hidden text-[11px] tracking-[0.4em] text-primary/70 md:inline-block"
       transition={
         prefersReducedMotion
           ? { duration: 0 }
