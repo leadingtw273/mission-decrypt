@@ -12,7 +12,7 @@ export function FrameBracket({ size, color, className, children }: FrameBracketP
 
   return (
     <div className={joinClasses('relative flex items-center justify-center', className)}>
-      <div className="pointer-events-none absolute inset-0">
+      <div className="pointer-events-none absolute inset-0 z-20">
         <Corner className="left-0 top-0" position="top-left" style={cornerStyle} />
         <Corner className="right-0 top-0" position="top-right" style={cornerStyle} />
         <Corner className="bottom-0 left-0" position="bottom-left" style={cornerStyle} />
