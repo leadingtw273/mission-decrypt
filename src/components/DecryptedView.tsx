@@ -118,12 +118,15 @@ export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps)
               const rawValue = mission[field.name];
               const displayValue = field.name === 'rallyTime' ? formatRallyTime(rawValue) : rawValue;
               const isBrief = field.name === 'missionBrief';
+              const cardClassName = isBrief
+                ? 'flex h-[10.5rem] flex-col border border-border bg-bg-primary/55 px-4 py-2.5'
+                : 'flex h-16 flex-col justify-center border border-border bg-bg-primary/55 px-4';
               const bodyClassName = isBrief
-                ? 'font-body mt-2 max-h-[9rem] overflow-y-auto whitespace-pre-wrap pr-2 text-sm leading-6 text-primary'
-                : 'font-body mt-2 whitespace-pre-wrap text-sm text-primary';
+                ? 'font-body mt-2 flex-1 overflow-y-auto whitespace-pre-wrap pr-2 text-sm leading-6 text-primary'
+                : 'font-body mt-1 truncate whitespace-nowrap text-sm text-primary';
 
               return (
-                <div key={field.name} className="border border-border bg-bg-primary/55 px-4 py-2.5">
+                <div key={field.name} className={cardClassName}>
                   <p className="font-label text-[11px] text-text/70">{field.label}</p>
                   <p className={bodyClassName}>
                     <AnimatedCipherText

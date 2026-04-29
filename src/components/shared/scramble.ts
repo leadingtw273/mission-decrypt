@@ -4,7 +4,7 @@ export function buildScrambleFrame(
   sourceText: string,
   targetText: string,
   progress: number,
-  seed: string,
+  _seed: string,
 ): string {
   const resolvedCharacters = Math.floor(targetText.length * progress);
 
@@ -23,8 +23,13 @@ export function buildScrambleFrame(
         return ' ';
       }
 
+      // Seed depends ONLY on sourceText + index (and optional jitter from
+      // the in-flight progress). The plaintext target deliberately does not
+      // contribute, so a position's scramble character is identical between
+      // LockedView (no plaintext) and DecryptedView at progress=0.
+      const jitter = progress > 0 && progress < 1 ? `:${progress.toFixed(3)}` : '';
       const poolIndex =
-        Math.abs(hashCode(`${seed}:${progress}:${index}:${fallback}`)) % SCRAMBLE_ALPHABET.length;
+        Math.abs(hashCode(`${sourceText}:${index}:${fallback}${jitter}`)) % SCRAMBLE_ALPHABET.length;
       return SCRAMBLE_ALPHABET[poolIndex] ?? fallback;
     })
     .join('');

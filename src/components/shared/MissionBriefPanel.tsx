@@ -199,14 +199,14 @@ function ClassificationRow({
 
   return (
     <FieldRow label="CLASSIFICATION">
-      <div className="flex items-center gap-2">
+      <div className="flex items-start gap-2">
         <div
-          className={`font-display flex h-6 min-w-[4rem] items-center justify-center border px-2 text-xs font-bold tracking-[0.2em] ${CLASSIFICATION_COLOR[classification]}`}
+          className={`font-display flex h-6 min-w-[4rem] flex-shrink-0 items-center justify-center border px-2 text-xs font-bold tracking-[0.2em] ${CLASSIFICATION_COLOR[classification]}`}
         >
           {CLASSIFICATION_LABEL[classification]}
         </div>
         {description ? (
-          <span className="font-label hidden truncate text-[10px] tracking-[0.12em] text-text/55 lg:inline">
+          <span className="font-label hidden text-[10px] leading-snug tracking-[0.12em] text-text/55 lg:inline">
             {description}
           </span>
         ) : null}

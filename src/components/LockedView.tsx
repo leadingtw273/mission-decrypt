@@ -108,18 +108,28 @@ export function LockedView({ asset, onSubmit, submitting }: LockedViewProps) {
 
         <div className="flex flex-col gap-4">
           <MissionBriefPanel state={{ kind: 'locked', missionId: asset.missionId }} />
-          <div className="grid gap-4">
-            {FIELD_SPECS.map((field) => (
-              <div key={field.name} className="border border-border bg-bg-primary/55 px-4 py-3">
-                <p className="font-label text-[11px] text-text/70">{field.label}</p>
-                <p className="font-body mt-2 break-all text-sm text-primary">
-                  <AnimatedCipherText
-                    mode="typewriter"
-                    text={toGibberish(asset.fields[field.name].ciphertext, field.length)}
-                  />
-                </p>
-              </div>
-            ))}
+          <div className="grid gap-3">
+            {FIELD_SPECS.map((field) => {
+              const isBrief = field.name === 'missionBrief';
+              const cardClassName = isBrief
+                ? 'flex h-[10.5rem] flex-col border border-border bg-bg-primary/55 px-4 py-2.5'
+                : 'flex h-16 flex-col justify-center border border-border bg-bg-primary/55 px-4';
+              const bodyClassName = isBrief
+                ? 'font-body mt-2 flex-1 overflow-y-auto whitespace-pre-wrap break-all pr-2 text-sm leading-6 text-primary'
+                : 'font-body mt-1 truncate whitespace-nowrap text-sm text-primary';
+
+              return (
+                <div key={field.name} className={cardClassName}>
+                  <p className="font-label text-[11px] text-text/70">{field.label}</p>
+                  <p className={bodyClassName}>
+                    <AnimatedCipherText
+                      mode="typewriter"
+                      text={toGibberish(asset.fields[field.name].ciphertext, field.length)}
+                    />
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
