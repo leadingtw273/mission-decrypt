@@ -111,7 +111,7 @@ export function LockedView({ asset, onSubmit, submitting }: LockedViewProps) {
           <div className="grid gap-3 lg:grid-cols-2">
             {FIELD_SPECS.map((field) => {
               const isBrief = field.name === 'missionBrief';
-              const isFullWidth = isBrief || field.name === 'rewardDistribution';
+              const isFullWidth = isBrief || field.name === 'accessPermission' || field.name === 'rewardDistribution';
               const cardClassName = isBrief
                 ? 'flex h-[10.5rem] flex-col border border-border bg-bg-primary/55 px-4 py-2.5 lg:col-span-2'
                 : `flex h-16 flex-col justify-center border border-border bg-bg-primary/55 px-4 ${isFullWidth ? 'lg:col-span-2' : ''}`;
