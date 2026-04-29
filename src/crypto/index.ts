@@ -40,6 +40,14 @@ export interface HeroImageInput {
   altText: string;
 }
 
+function defaultMissionUrl(missionId: string): string {
+  const origin = typeof location !== 'undefined' ? location.origin : 'https://vesper.example';
+  // Vite injects BASE_URL as '/mission-decrypt/' in production builds and '/'
+  // in dev/test; both forms are guaranteed to start and end with '/'.
+  const base = import.meta.env.BASE_URL ?? '/';
+  return `${origin}${base}?mission_id=${missionId}`;
+}
+
 export async function encryptMission(input: {
   mission: MissionPlaintext;
   heroImage: HeroImageInput;
@@ -121,7 +129,7 @@ export async function encryptMission(input: {
     links.push({
       gameId: member.raw,
       personalKey,
-      url: `${typeof location !== 'undefined' ? location.origin : 'https://vesper.example'}/?mission_id=${missionId}`,
+      url: defaultMissionUrl(missionId),
     });
   }
 
@@ -266,7 +274,7 @@ export async function addMissionMember(input: {
     links.push({
       gameId: newMember.raw,
       personalKey: newPersonalKey,
-      url: `${typeof location !== 'undefined' ? location.origin : 'https://vesper.example'}/?mission_id=${asset.missionId}`,
+      url: defaultMissionUrl(asset.missionId),
     });
   }
 

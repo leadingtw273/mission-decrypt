@@ -31,13 +31,25 @@ export async function extendMission(input: ExtendMissionInput): Promise<ExtendMi
     newMembers,
   });
 
-  const mappedLinks = baseUrl
-    ? links.map((link) => ({ ...link, url: `${baseUrl}?mission_id=${asset.missionId}` }))
-    : links;
+  const mappedLinks = baseUrl ? overrideLinks(links, baseUrl, asset.missionId) : links;
 
   return {
     asset: extendedAsset,
     links: mappedLinks,
     missionId: asset.missionId,
   };
+}
+
+function overrideLinks(links: MemberLink[], baseUrl: string, missionId: string): MemberLink[] {
+  const url = new URL(baseUrl);
+  url.search = '';
+  url.hash = '';
+  if (!url.pathname.endsWith('/')) {
+    url.pathname = `${url.pathname}/`;
+  }
+
+  return links.map((link) => ({
+    ...link,
+    url: `${url.toString()}?mission_id=${missionId}`,
+  }));
 }

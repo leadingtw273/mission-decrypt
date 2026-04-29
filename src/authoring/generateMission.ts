@@ -34,9 +34,13 @@ export async function generateMission(input: GenerateMissionInput): Promise<Gene
 
 function overrideLinkBaseUrl(links: MemberLink[], baseUrl: string, missionId: string): MemberLink[] {
   const url = new URL(baseUrl);
-  url.pathname = '/';
+  // Preserve the pathname (e.g. '/mission-decrypt/' for the deployed site);
+  // only strip search/hash since those are mission-scoped.
   url.search = '';
   url.hash = '';
+  if (!url.pathname.endsWith('/')) {
+    url.pathname = `${url.pathname}/`;
+  }
 
   return links.map((link) => ({
     ...link,

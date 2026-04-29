@@ -44,7 +44,7 @@ describe('generateMission', () => {
     });
 
     for (const link of result.links) {
-      expect(link.url).toBe(`https://ops.example/?mission_id=${result.missionId}`);
+      expect(link.url).toBe(`https://ops.example/base/?mission_id=${result.missionId}`);
     }
 
     const decrypted = await decryptMission({
