@@ -57,9 +57,23 @@ interface MissionFieldDef {
   placeholder?: string;
   helper?: string;
   options?: Array<{ value: string; label: string }>;
+  // Forces the field to span both columns of the 2-col field grid on md+.
+  // Used for long-text fields (codename / brief) and fields the decrypted
+  // card already renders full-width.
+  fullWidth?: boolean;
 }
 
 const MISSION_FIELDS: MissionFieldDef[] = [
+  // Order is tuned for the 2-column md+ grid: 6 paired single-column fields
+  // sandwich one full-width row at the top and three at the bottom, so the
+  // grid never has an empty cell on a non-fullWidth row.
+  {
+    name: 'codename',
+    label: 'Operation Codename',
+    placeholder: 'DEEP SPACE HUNT / 深空狩獵',
+    helper: '英文 / 中文 用斜線分隔，UI 會自動拆成兩行顯示，UID 直接綁定 missionId。',
+    fullWidth: true,
+  },
   {
     name: 'classification',
     label: 'Classification',
@@ -70,12 +84,6 @@ const MISSION_FIELDS: MissionFieldDef[] = [
       { value: 'high', label: 'HIGH (高) — 不可向本團成員以外人員透露' },
       { value: 'low', label: 'LOW (低) — 不可未經授權對外公開內容' },
     ],
-  },
-  {
-    name: 'codename',
-    label: 'Operation Codename',
-    placeholder: 'DEEP SPACE HUNT / 深空狩獵',
-    helper: '英文 / 中文 用斜線分隔，UI 會自動拆成兩行顯示，UID 直接綁定 missionId。',
   },
   {
     name: 'difficulty',
@@ -94,55 +102,50 @@ const MISSION_FIELDS: MissionFieldDef[] = [
     name: 'missionCommander',
     label: 'Mission Commander',
     placeholder: '老周【leadingtw】',
-    helper: '單行；過長會在卡片內被 truncate。',
   },
   {
     name: 'communicationChannel',
     label: 'Communication Channel',
     placeholder: '戰略頻道 > 星際遨遊',
-    helper: '單行；建議用「>」標示子頻道。',
-  },
-  {
-    name: 'missionTime',
-    label: 'Estimated Duration',
-    placeholder: '2H、30M、2H30M',
-    helper: '預計任務時長，自由字串原樣顯示，建議使用 H/M/D 後綴。',
   },
   {
     name: 'rallyTime',
     label: 'Rally Time',
     kind: 'datetime',
-    helper: '集合時間；以本機時區送出，會自動轉成 ISO 8601 並驅動倒數 LCD。',
+    helper: '本機時區送出，自動轉 ISO 8601 並驅動倒數 LCD。',
+  },
+  {
+    name: 'missionTime',
+    label: 'Estimated Duration',
+    placeholder: '2H、30M、2H30M',
   },
   {
     name: 'rallyLocation',
     label: 'Rally Location',
     placeholder: '奧里森空域，進入隊伍跳點',
-    helper: '單行；超過寬度會 truncate。',
   },
   {
     name: 'requiredGear',
     label: 'Required Gear',
     placeholder: '隨意，自身主武器彈藥備足(約40匣)',
-    helper: '單行；極機密任務在此欄位前強制暫停。',
   },
   {
     name: 'accessPermission',
     label: 'Access Permission',
     placeholder: '所有人，若有阿波蘿請開阿波蘿',
-    helper: 'lg+ 視窗滿寬顯示，可放較長條件。',
+    fullWidth: true,
   },
   {
     name: 'rewardDistribution',
     label: 'Reward Distribution',
     placeholder: '酣暢淋漓的槍戰體驗',
-    helper: 'lg+ 視窗滿寬。',
+    fullWidth: true,
   },
   {
     name: 'missionBrief',
     label: 'Mission Brief',
     kind: 'multiline',
-    helper: '多行說明；卡片高度固定 6 行，內容超過後內捲。',
+    fullWidth: true,
   },
 ];
 
@@ -450,8 +453,8 @@ export function AuthoringModal({
           color="primary"
           className="block border border-primary/35 bg-bg-primary/95 shadow-[0_0_60px_rgba(255,186,0,0.12)]"
         >
-          <section className="relative max-h-[90vh] overflow-y-auto px-5 py-5 md:px-8 md:py-8">
-            <div className="mb-6 flex items-start justify-between gap-4 border-b border-primary/20 pb-4">
+          <section className="relative max-h-[92vh] overflow-y-auto px-5 py-5 md:px-8 md:py-6 [scrollbar-width:thin] [scrollbar-color:rgba(255,186,0,0.35)_transparent]">
+            <div className="mb-4 flex items-start justify-between gap-4 border-b border-primary/20 pb-3">
               <div>
                 <p className="font-label text-xs uppercase tracking-[0.35em] text-primary/75">Vesper Mission Authoring</p>
                 <h2 className="font-label mt-2 text-2xl uppercase tracking-[0.22em] text-primary">Commander Control Deck</h2>
@@ -586,8 +589,8 @@ function AuthoringStage(props: {
   onSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>;
 }) {
   return (
-    <form className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]" onSubmit={props.onSubmit}>
-      <div className="grid gap-4">
+    <form className="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]" onSubmit={props.onSubmit}>
+      <div className="grid gap-x-4 gap-y-3 md:grid-cols-2">
         {MISSION_FIELDS.map((field) => (
           <MissionFieldControl
             key={field.name}
@@ -680,15 +683,15 @@ function MissionFieldControl(props: {
   const kind = field.kind ?? 'text';
 
   return (
-    <label className="space-y-1.5" htmlFor={id}>
+    <label className={`space-y-1 ${field.fullWidth ? 'md:col-span-2' : ''}`} htmlFor={id}>
       <span className="font-label block text-xs uppercase tracking-[0.22em] text-text/72">{field.label}</span>
       {field.helper ? (
-        <span className="font-body block text-[11px] leading-relaxed text-text/55">{field.helper}</span>
+        <span className="font-body block text-[10px] leading-tight text-text/70">{field.helper}</span>
       ) : null}
       {kind === 'multiline' ? (
         <textarea
           aria-label={field.label}
-          className="font-body min-h-32 w-full resize-y border border-border bg-bg-secondary/70 px-5 py-4 text-text outline-none transition focus:border-primary"
+          className="font-body min-h-24 w-full resize-y border border-border bg-bg-secondary/70 px-5 py-4 text-text outline-none transition focus:border-primary"
           id={id}
           required
           value={props.value}
@@ -804,7 +807,7 @@ function ModeTabs({
     }`;
 
   return (
-    <div className="mb-6 flex gap-2">
+    <div className="mb-4 flex gap-2">
       <button
         type="button"
         className={tabClass(mode === 'create')}
