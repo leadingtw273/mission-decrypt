@@ -54,7 +54,7 @@ export function App() {
         <p className="font-label text-text/70">SECURE COMMUNICATION PROTOCOL</p>
       </header>
 
-      <section className="mx-auto flex w-full flex-1 flex-col justify-center py-4 md:w-[70%] md:py-8">
+      <section className="mx-auto flex w-full flex-1 flex-col justify-center md:w-[70%] md:py-8">
         {renderStateView(state, submit, retry)}
       </section>
 
