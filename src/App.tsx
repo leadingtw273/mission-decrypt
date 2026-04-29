@@ -5,7 +5,6 @@ import { generateMission } from './authoring/generateMission';
 import type { CommanderIdentity } from './authoring/identity';
 import { loadIdentity, saveIdentity } from './authoring/identity';
 import { DecryptedView } from './components/DecryptedView';
-import { DecryptingView } from './components/DecryptingView';
 import { ErrorView } from './components/ErrorView';
 import { LockedView } from './components/LockedView';
 import { generateSigningKeypair } from './crypto/sign';
@@ -85,7 +84,7 @@ function renderStateView(
     case 'LOCKED':
       return <LockedView asset={state.asset} onSubmit={submit} submitting={false} />;
     case 'DECRYPTING':
-      return <DecryptingView />;
+      return <LockedView asset={state.asset} onSubmit={submit} submitting={true} />;
     case 'DECRYPTED':
       return <DecryptedView asset={state.asset} mission={state.mission} heroImage={state.heroImage} />;
     case 'ERROR':
