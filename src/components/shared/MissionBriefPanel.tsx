@@ -127,10 +127,10 @@ function RestingPanel({
       transition={{ duration: prefersReducedMotion ? 0 : 0.4 }}
     >
       <CodenameBlock codename={codename} missionId={missionId} />
-      <div className="flex flex-col justify-between gap-2 md:gap-3">
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-1 md:grid-rows-3 md:gap-3">
         <ClassificationRow classification={classification} />
-        <DifficultyRow difficulty={difficulty} />
-        <CountdownRow rallyTimeIso={rallyTimeIso} />
+        <CountdownRow rallyTimeIso={rallyTimeIso} className="md:row-start-3" />
+        <DifficultyRow difficulty={difficulty} className="col-span-2 md:col-span-1 md:row-start-2" />
       </div>
     </motion.div>
   );
@@ -181,9 +181,17 @@ function parseCodename(codename: string | null): { en: string | null; zh: string
   return { en: first ?? null, zh: rest.join(' / ') };
 }
 
-function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
+function FieldRow({
+  label,
+  children,
+  className,
+}: {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div className="flex flex-col gap-1">
+    <div className={`flex flex-col gap-1${className ? ` ${className}` : ''}`}>
       <span className="font-label text-[9px] tracking-[0.32em] text-text/55">{label}</span>
       {children}
     </div>
@@ -192,13 +200,15 @@ function FieldRow({ label, children }: { label: string; children: React.ReactNod
 
 function ClassificationRow({
   classification,
+  className,
 }: {
   classification: ClassificationLevel | 'unknown';
+  className?: string;
 }) {
   const description = classification === 'unknown' ? null : CLASSIFICATION_DESCRIPTION[classification];
 
   return (
-    <FieldRow label="CLASSIFICATION">
+    <FieldRow label="CLASSIFICATION" {...(className ? { className } : {})}>
       <div className="relative">
         <div
           className={`font-display inline-flex h-6 min-w-[4rem] items-center justify-center border px-2 text-xs font-bold tracking-[0.2em] ${CLASSIFICATION_COLOR[classification]}`}
@@ -215,13 +225,19 @@ function ClassificationRow({
   );
 }
 
-function DifficultyRow({ difficulty }: { difficulty: DifficultyLevel | null }) {
+function DifficultyRow({
+  difficulty,
+  className,
+}: {
+  difficulty: DifficultyLevel | null;
+  className?: string;
+}) {
   const filled = difficulty ? DIFFICULTY_INDEX[difficulty] : 0;
   const colorClass = difficulty ? DIFFICULTY_COLOR[difficulty] : 'text-text/45';
   const fillClass = difficulty ? DIFFICULTY_FILL[difficulty] : 'bg-text/20';
 
   return (
-    <FieldRow label="DIFFICULTY">
+    <FieldRow label="DIFFICULTY" {...(className ? { className } : {})}>
       <div className="flex items-center gap-2">
         <div className="flex flex-1 items-center gap-1" aria-label="Difficulty gauge">
           {Array.from({ length: 5 }, (_, index) => {
@@ -247,13 +263,19 @@ function DifficultyRow({ difficulty }: { difficulty: DifficultyLevel | null }) {
   );
 }
 
-function CountdownRow({ rallyTimeIso }: { rallyTimeIso: string | null }) {
+function CountdownRow({
+  rallyTimeIso,
+  className,
+}: {
+  rallyTimeIso: string | null;
+  className?: string;
+}) {
   const value = useCountdown(rallyTimeIso);
   const display = value ?? '888888';
   const [hh, mm, ss] = splitTriplet(display);
 
   return (
-    <FieldRow label="COUNTDOWN">
+    <FieldRow label="COUNTDOWN" {...(className ? { className } : {})}>
       <div className="flex items-end gap-1">
         <LcdDigits nums={hh} />
         <LcdSeparator />
