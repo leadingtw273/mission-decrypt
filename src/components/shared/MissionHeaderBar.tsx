@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+// @ts-expect-error - react-digital-number ships untyped CommonJS bundle and its package.json points main: 'index.js' to a missing path; the real entry is dist/index.js
+import DigitalNumber from 'react-digital-number/dist/index.js';
 
 import type { ClassificationLevel } from '../../crypto/schema';
 import { ProgressBar } from './ProgressBar';
@@ -38,11 +40,15 @@ const CLASSIFICATION_COLOR: Record<ClassificationLevel | 'unknown', string> = {
   unknown: 'text-text/45 border-text/30',
 };
 
-const LCD_PLACEHOLDER = '88:88:88';
+const LCD_ACTIVE_COLOR = '#FFBA00';
+const LCD_INACTIVE_COLOR = 'rgba(255, 186, 0, 0.12)';
+const LCD_BACKGROUND_COLOR = 'transparent';
+const LCD_DIGIT_WIDTH = 18;
+const LCD_DIGIT_HEIGHT = 32;
 
 export function MissionHeaderBar({ state }: { state: MissionHeaderState }) {
   return (
-    <div className="relative flex h-20 items-center overflow-hidden border border-border bg-bg-primary/55 px-4">
+    <div className="relative flex h-24 items-center overflow-hidden border border-border bg-bg-primary/55 px-4">
       <AnimatePresence mode="wait" initial={false}>
         {state.kind === 'decrypting' ? (
           <DecryptingBar key="decrypting" progress={state.progress} />
@@ -66,6 +72,7 @@ function RestingBar({
   rallyTimeIso: string | null;
 }) {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const isUnknown = classification === 'unknown';
 
   return (
     <motion.div
@@ -76,7 +83,7 @@ function RestingBar({
       transition={{ duration: prefersReducedMotion ? 0 : 0.4 }}
     >
       <ClassificationBlock classification={classification} />
-      <StandbyDecoration />
+      {isUnknown ? <StandbyDecoration /> : <span aria-hidden="true" className="flex-1" />}
       <CountdownLcd rallyTimeIso={rallyTimeIso} />
     </motion.div>
   );
@@ -90,17 +97,20 @@ function ClassificationBlock({
   const description = classification === 'unknown' ? null : CLASSIFICATION_DESCRIPTION[classification];
 
   return (
-    <div className="flex min-w-0 flex-shrink-0 items-center gap-3">
-      <div
-        className={`font-display flex h-12 min-w-[5.25rem] items-center justify-center border px-3 text-base tracking-[0.18em] ${CLASSIFICATION_COLOR[classification]}`}
-      >
-        {CLASSIFICATION_LABEL[classification]}
+    <div className="flex min-w-0 flex-shrink-0 flex-col gap-1">
+      <span className="font-label text-[10px] tracking-[0.32em] text-text/55">CLASSIFICATION</span>
+      <div className="flex items-center gap-3">
+        <div
+          className={`font-display flex h-9 min-w-[5.5rem] items-center justify-center border px-3 text-base font-bold tracking-[0.22em] ${CLASSIFICATION_COLOR[classification]}`}
+        >
+          {CLASSIFICATION_LABEL[classification]}
+        </div>
+        {description ? (
+          <span className="font-label whitespace-nowrap text-[11px] tracking-[0.12em] text-text/55">
+            {description}
+          </span>
+        ) : null}
       </div>
-      {description ? (
-        <span className="font-label whitespace-nowrap text-[11px] tracking-[0.12em] text-text/55">
-          {description}
-        </span>
-      ) : null}
     </div>
   );
 }
@@ -126,14 +136,55 @@ function StandbyDecoration() {
 
 function CountdownLcd({ rallyTimeIso }: { rallyTimeIso: string | null }) {
   const value = useCountdown(rallyTimeIso);
+  const display = value ?? '888888';
+  const [hh, mm, ss] = splitTriplet(display);
+
   return (
-    <div className="relative font-display flex-shrink-0 select-none text-2xl tracking-[0.15em]">
-      <span aria-hidden="true" className="text-primary/15">
-        {LCD_PLACEHOLDER}
-      </span>
-      <span className="absolute inset-0 text-primary">{value ?? LCD_PLACEHOLDER}</span>
+    <div className="flex flex-shrink-0 items-end gap-1">
+      <LcdDigits nums={hh} />
+      <LcdSeparator />
+      <LcdDigits nums={mm} />
+      <LcdSeparator />
+      <LcdDigits nums={ss} />
     </div>
   );
+}
+
+function LcdDigits({ nums }: { nums: string }) {
+  const width = `${nums.length * LCD_DIGIT_WIDTH}px`;
+  return (
+    <div style={{ width, height: `${LCD_DIGIT_HEIGHT}px` }}>
+      <DigitalNumber
+        nums={nums}
+        color={LCD_ACTIVE_COLOR}
+        unActiveColor={LCD_INACTIVE_COLOR}
+        backgroundColor={LCD_BACKGROUND_COLOR}
+      />
+    </div>
+  );
+}
+
+function LcdSeparator() {
+  return (
+    <span
+      aria-hidden="true"
+      className="font-display select-none pb-1 text-2xl leading-none text-primary"
+    >
+      :
+    </span>
+  );
+}
+
+function splitTriplet(value: string): [string, string, string] {
+  const parts = value.split(':');
+  if (parts.length === 3) {
+    return [parts[0], parts[1], parts[2]] as [string, string, string];
+  }
+  // Placeholder "888888" → 88:88:88
+  if (value.length === 6) {
+    return [value.slice(0, 2), value.slice(2, 4), value.slice(4, 6)];
+  }
+  return ['88', '88', '88'];
 }
 
 function DecryptingBar({ progress }: { progress: number }) {

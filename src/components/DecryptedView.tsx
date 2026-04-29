@@ -75,10 +75,6 @@ export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps)
     <section className="relative overflow-hidden border border-border bg-bg-secondary/60 px-6 py-8 shadow-[0_0_40px_rgba(255,186,0,0.06)] md:px-8">
       {!showImage ? <ScannerSweep /> : null}
 
-      <div className="absolute right-6 top-6 text-primary md:right-8 md:top-8">
-        <CheckmarkIcon />
-      </div>
-
       <div className="relative z-10 grid gap-8 lg:grid-cols-2 lg:items-stretch">
         <div className="flex justify-center lg:block lg:h-full">
           <FrameBracket
@@ -161,17 +157,3 @@ function DecryptingScan() {
   );
 }
 
-function CheckmarkIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-9 w-9 drop-shadow-[0_0_12px_rgba(255,186,0,0.22)]"
-      viewBox="0 0 64 64"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <circle cx="32" cy="32" r="23" stroke="currentColor" strokeOpacity="0.28" strokeWidth="2" />
-      <path d="M18 33L28 43L46 22" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="5" />
-    </svg>
-  );
-}
