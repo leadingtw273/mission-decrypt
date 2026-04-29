@@ -76,17 +76,17 @@ export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps)
       {!showImage ? <ScannerSweep /> : null}
 
       <div className="relative z-10 grid gap-8 lg:grid-cols-2 lg:items-stretch">
-        <div className="flex justify-center lg:block lg:h-full">
+        <div className="w-full lg:h-full">
           <FrameBracket
             size={28}
             color="primary"
-            className="w-full max-w-[320px] overflow-hidden border border-primary/30 bg-bg-primary/70 bg-scan-stripes p-3 lg:h-full lg:max-w-none lg:p-0"
+            className="w-full overflow-hidden border border-primary/30 bg-bg-primary/70 bg-scan-stripes p-3 lg:h-full lg:p-0"
           >
             {showImage && heroImageUrl ? (
               <motion.img
                 alt={heroImage.altText}
                 animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1 }}
-                className="aspect-[4/5] w-full object-contain lg:aspect-auto lg:h-full"
+                className="aspect-video w-full object-contain md:aspect-[4/5] lg:aspect-auto lg:h-full"
                 initial={prefersReducedMotion ? false : { opacity: 0 }}
                 src={heroImageUrl}
                 transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.6, ease: 'easeOut' }}

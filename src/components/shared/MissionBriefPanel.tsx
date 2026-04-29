@@ -84,7 +84,7 @@ const LCD_DIGIT_HEIGHT = 28;
 
 export function MissionBriefPanel({ state }: { state: MissionBriefState }) {
   return (
-    <div className="relative overflow-hidden border border-border bg-bg-primary/55 px-4 py-3 md:h-[220px] md:px-6 md:py-4">
+    <div className="relative min-h-[340px] overflow-hidden border border-border bg-bg-primary/55 px-4 py-3 md:h-[220px] md:min-h-0 md:px-6 md:py-4">
       <AnimatePresence mode="wait" initial={false}>
         {state.kind === 'decrypting' ? (
           <DecryptingOverlay key="decrypting" progress={state.progress} />
