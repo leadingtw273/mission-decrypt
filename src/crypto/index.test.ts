@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { encryptMission, decryptMission } from './index';
+import { encryptMission, decryptMission, type MissionPlaintext } from './index';
 import { generateSigningKeypair, exportPublicKey, importPublicKey } from './sign';
 
-const samplePlaintext = {
+const samplePlaintext: MissionPlaintext = {
   classification: 'high',
   codename: 'TEST OP / 測試任務',
   difficulty: 'normal',

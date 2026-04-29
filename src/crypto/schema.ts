@@ -88,9 +88,23 @@ export const MissionAssetV1Schema = z.object({
 
 export type MissionAssetV1 = z.infer<typeof MissionAssetV1Schema>;
 
-export const MissionPlaintextSchema = z.object(
-  Object.fromEntries(FIELD_NAMES.map((n) => [n, z.string()])) as Record<FieldName, z.ZodString>,
-);
+// Plaintext schema mirrors what the authoring form is allowed to emit:
+// classification + difficulty are constrained enums so display badges /
+// gauges always have a known palette to render against.
+export const MissionPlaintextSchema = z.object({
+  classification: z.enum(CLASSIFICATION_VALUES),
+  codename: z.string(),
+  difficulty: z.enum(DIFFICULTY_VALUES),
+  missionCommander: z.string(),
+  communicationChannel: z.string(),
+  missionTime: z.string(),
+  rallyTime: z.string(),
+  rallyLocation: z.string(),
+  requiredGear: z.string(),
+  accessPermission: z.string(),
+  rewardDistribution: z.string(),
+  missionBrief: z.string(),
+});
 
 export type MissionPlaintext = z.infer<typeof MissionPlaintextSchema>;
 

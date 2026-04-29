@@ -1,10 +1,10 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { encryptMission, type MissionAssetV1 } from '../crypto';
+import { encryptMission, type MissionAssetV1, type MissionPlaintext } from '../crypto';
 import { generateSigningKeypair } from '../crypto/sign';
 import { loadAsset } from './loadAsset';
 
-const sampleMission = {
+const sampleMission: MissionPlaintext = {
   classification: 'high',
   codename: 'TEST OP / 測試任務',
   difficulty: 'normal',

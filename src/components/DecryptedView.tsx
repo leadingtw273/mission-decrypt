@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 
 import type { MissionAssetV1, MissionPlaintext } from '../crypto';
-import type { ClassificationLevel, DifficultyLevel, FieldName } from '../crypto/schema';
+import type { FieldName } from '../crypto/schema';
 import { AnimatedCipherText } from './shared/AnimatedCipherText';
 import { Button } from './shared/Button';
 import { FrameBracket } from './shared/FrameBracket';
@@ -150,9 +150,9 @@ export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps)
                 ? {
                     kind: 'decrypted',
                     missionId: asset.missionId,
-                    classification: mission.classification as ClassificationLevel,
+                    classification: mission.classification,
                     codename: mission.codename,
-                    difficulty: mission.difficulty as DifficultyLevel,
+                    difficulty: mission.difficulty,
                     rallyTimeIso: mission.rallyTime,
                   }
                 : { kind: 'decrypting', progress, missionId: asset.missionId }
