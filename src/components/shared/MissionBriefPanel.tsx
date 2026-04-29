@@ -155,7 +155,7 @@ function CodenameBlock({
       <div className="flex w-full min-w-0 flex-col items-center gap-1 text-center">
         <span className="font-label text-[10px] tracking-[0.32em] text-text/55">CODENAME</span>
         <span
-          className={`font-display block w-full break-words text-lg font-bold leading-tight tracking-[0.1em] md:text-xl lg:text-2xl lg:tracking-[0.14em] ${isLocked ? 'text-text/35' : 'text-orange-400'}`}
+          className={`font-display block w-full break-words text-xl font-bold leading-tight tracking-[0.12em] md:text-2xl md:tracking-[0.14em] ${isLocked ? 'text-text/35' : 'text-orange-400'}`}
         >
           {en ?? '— — — —'}
         </span>
@@ -216,7 +216,7 @@ function ClassificationRow({
           {CLASSIFICATION_LABEL[classification]}
         </div>
         {description ? (
-          <span className="font-label absolute left-0 top-full mt-1 hidden text-[9px] leading-snug tracking-[0.08em] text-text/55 lg:block">
+          <span className="font-label absolute left-0 top-full mt-1 block text-[9px] leading-snug tracking-[0.08em] text-text/55">
             {description}
           </span>
         ) : null}
