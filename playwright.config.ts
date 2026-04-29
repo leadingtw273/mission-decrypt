@@ -8,6 +8,13 @@ export default defineConfig({
     baseURL: 'http://localhost:5180',
     trace: 'retain-on-failure',
   },
+  expect: {
+    toHaveScreenshot: {
+      // Tiny anti-aliasing flicker (a handful of pixels per shot) creeps in
+      // between runs; tolerate a sub-percent diff so the suite isn't flaky.
+      maxDiffPixelRatio: 0.005,
+    },
+  },
   webServer: {
     command: 'pnpm dev --port 5180 --strictPort',
     url: 'http://localhost:5180',

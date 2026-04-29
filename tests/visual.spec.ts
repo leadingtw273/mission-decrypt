@@ -65,16 +65,18 @@ test.describe('motion states', () => {
     await page.clock.install({ time: FROZEN_NOW });
   });
 
-  test('extreme warning panel xl', async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 1100 });
-    await page.goto('/?mission_id=_example');
-    await page.getByLabel('Game ID').fill(TEST_GAME_ID);
-    await page.getByLabel('Private Key').fill(TEST_PERSONAL_KEY);
-    await page.getByRole('button', { name: 'START DECRYPTION' }).click();
-    // Wait for the rAF loop to reach the REQUIRED GEAR pause point.
-    await expect(page.getByText('EXTREME CLASSIFICATION')).toBeVisible({ timeout: 10000 });
-    await expect(page).toHaveScreenshot('extreme-warning-xl.png', {
-      fullPage: true,
+  for (const vp of VIEWPORTS) {
+    test(`extreme warning ${vp.label}`, async ({ page }) => {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await page.goto('/?mission_id=_example');
+      await page.getByLabel('Game ID').fill(TEST_GAME_ID);
+      await page.getByLabel('Private Key').fill(TEST_PERSONAL_KEY);
+      await page.getByRole('button', { name: 'START DECRYPTION' }).click();
+      // Wait for the rAF loop to reach the REQUIRED GEAR pause point.
+      await expect(page.getByText('EXTREME CLASSIFICATION')).toBeVisible({ timeout: 10000 });
+      await expect(page).toHaveScreenshot(`extreme-warning-${vp.label}.png`, {
+        fullPage: true,
+      });
     });
-  });
+  }
 });
