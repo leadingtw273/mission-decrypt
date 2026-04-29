@@ -121,7 +121,7 @@ export function DecryptedView({ asset, mission, heroImage }: DecryptedViewProps)
           <FrameBracket
             size={28}
             color="primary"
-            className="w-full overflow-hidden border border-primary/30 bg-bg-primary/70 bg-scan-stripes p-3 xl:h-full xl:p-0"
+            className="w-full overflow-hidden border border-primary/30 bg-bg-primary/70 bg-scan-stripes xl:h-full"
           >
             {showImage && heroImageUrl ? (
               <motion.img
