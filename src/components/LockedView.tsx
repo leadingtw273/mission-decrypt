@@ -15,16 +15,16 @@ type LockedViewProps = {
   submitting: boolean;
 };
 
-const FIELD_SPECS: Array<{ name: FieldName; label: string; length: number }> = [
-  { name: 'missionCommander', label: 'MISSION COMMANDER', length: 24 },
-  { name: 'communicationChannel', label: 'COMMUNICATION CHANNEL', length: 30 },
-  { name: 'missionTime', label: 'MISSION TIME', length: 18 },
-  { name: 'rallyTime', label: 'RALLY TIME', length: 18 },
-  { name: 'rallyLocation', label: 'RALLY LOCATION', length: 20 },
-  { name: 'requiredGear', label: 'REQUIRED GEAR', length: 28 },
-  { name: 'accessPermission', label: 'ACCESS PERMISSION', length: 22 },
-  { name: 'rewardDistribution', label: 'REWARD DISTRIBUTION', length: 24 },
-  { name: 'missionBrief', label: 'MISSION BRIEF', length: 50 },
+const FIELD_SPECS: Array<{ name: FieldName; label: string }> = [
+  { name: 'missionCommander', label: 'MISSION COMMANDER' },
+  { name: 'communicationChannel', label: 'COMMUNICATION CHANNEL' },
+  { name: 'missionTime', label: 'MISSION TIME' },
+  { name: 'rallyTime', label: 'RALLY TIME' },
+  { name: 'rallyLocation', label: 'RALLY LOCATION' },
+  { name: 'requiredGear', label: 'REQUIRED GEAR' },
+  { name: 'accessPermission', label: 'ACCESS PERMISSION' },
+  { name: 'rewardDistribution', label: 'REWARD DISTRIBUTION' },
+  { name: 'missionBrief', label: 'MISSION BRIEF' },
 ];
 
 
@@ -108,15 +108,17 @@ export function LockedView({ asset, onSubmit, submitting }: LockedViewProps) {
 
         <div className="flex flex-col gap-4">
           <MissionBriefPanel state={{ kind: 'locked', missionId: asset.missionId }} />
-          <div className="grid gap-3">
+          <div className="grid gap-3 lg:grid-cols-2">
             {FIELD_SPECS.map((field) => {
               const isBrief = field.name === 'missionBrief';
+              const isFullWidth = isBrief || field.name === 'rewardDistribution';
               const cardClassName = isBrief
-                ? 'flex h-[10.5rem] flex-col border border-border bg-bg-primary/55 px-4 py-2.5'
-                : 'flex h-16 flex-col justify-center border border-border bg-bg-primary/55 px-4';
+                ? 'flex h-[10.5rem] flex-col border border-border bg-bg-primary/55 px-4 py-2.5 lg:col-span-2'
+                : `flex h-16 flex-col justify-center border border-border bg-bg-primary/55 px-4 ${isFullWidth ? 'lg:col-span-2' : ''}`;
               const bodyClassName = isBrief
                 ? 'font-body mt-2 flex-1 overflow-y-auto whitespace-pre-wrap break-all pr-2 text-sm leading-6 text-primary'
                 : 'font-body mt-1 truncate whitespace-nowrap text-sm text-primary';
+              const fieldData = asset.fields[field.name];
 
               return (
                 <div key={field.name} className={cardClassName}>
@@ -124,7 +126,7 @@ export function LockedView({ asset, onSubmit, submitting }: LockedViewProps) {
                   <p className={bodyClassName}>
                     <AnimatedCipherText
                       mode="typewriter"
-                      text={toGibberish(asset.fields[field.name].ciphertext, field.length)}
+                      text={toGibberish(fieldData.ciphertext, fieldData.charCount)}
                     />
                   </p>
                 </div>

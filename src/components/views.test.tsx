@@ -31,18 +31,18 @@ const sampleAsset: MissionAssetV1 = {
     pilot7: { salt: 'AAAA', iv: 'BBBB', wrapped: 'CCCC' },
   },
   fields: {
-    classification: { iv: 'iv00', ciphertext: 'ClassificationCipher01234_-ClassCipher' },
-    codename: { iv: 'iv00', ciphertext: 'ClassificationCipher01234_-ClassCipher' },
-    difficulty: { iv: 'iv00', ciphertext: 'ClassificationCipher01234_-ClassCipher' },
-    missionCommander: { iv: 'iv01', ciphertext: 'AbCdEfGhIjKlMnOpQrStUvWxYz01_-' },
-    communicationChannel: { iv: 'iv02', ciphertext: 'zYxWvUtSrQpOnMlKjIhGfEdCbA10_-' },
-    missionTime: { iv: 'iv03', ciphertext: 'TimeCipher12345_-TimeCipher12345_-' },
-    rallyTime: { iv: 'iv04', ciphertext: 'RallyCipher12345_-RallyCipher12345' },
-    rallyLocation: { iv: 'iv05', ciphertext: 'LocationCipher09876_-LocationCipher' },
-    requiredGear: { iv: 'iv06', ciphertext: 'GearCipherAlphaBeta12345_-GearCipher' },
-    accessPermission: { iv: 'iv07', ciphertext: 'AccessCipherAlphaBeta12345_-Access' },
-    rewardDistribution: { iv: 'iv08', ciphertext: 'RewardCipherAlphaBeta12345_-Reward' },
-    missionBrief: { iv: 'iv09', ciphertext: 'MissionBriefCipherAlphaBeta12345_-' },
+    classification: { iv: 'iv00', ciphertext: 'ClassificationCipher01234_-ClassCipher', charCount: 12 },
+    codename: { iv: 'iv00', ciphertext: 'ClassificationCipher01234_-ClassCipher', charCount: 12 },
+    difficulty: { iv: 'iv00', ciphertext: 'ClassificationCipher01234_-ClassCipher', charCount: 12 },
+    missionCommander: { iv: 'iv01', ciphertext: 'AbCdEfGhIjKlMnOpQrStUvWxYz01_-', charCount: 12 },
+    communicationChannel: { iv: 'iv02', ciphertext: 'zYxWvUtSrQpOnMlKjIhGfEdCbA10_-', charCount: 12 },
+    missionTime: { iv: 'iv03', ciphertext: 'TimeCipher12345_-TimeCipher12345_-', charCount: 12 },
+    rallyTime: { iv: 'iv04', ciphertext: 'RallyCipher12345_-RallyCipher12345', charCount: 12 },
+    rallyLocation: { iv: 'iv05', ciphertext: 'LocationCipher09876_-LocationCipher', charCount: 12 },
+    requiredGear: { iv: 'iv06', ciphertext: 'GearCipherAlphaBeta12345_-GearCipher', charCount: 12 },
+    accessPermission: { iv: 'iv07', ciphertext: 'AccessCipherAlphaBeta12345_-Access', charCount: 12 },
+    rewardDistribution: { iv: 'iv08', ciphertext: 'RewardCipherAlphaBeta12345_-Reward', charCount: 12 },
+    missionBrief: { iv: 'iv09', ciphertext: 'MissionBriefCipherAlphaBeta12345_-', charCount: 12 },
   },
   heroImage: {
     iv: 'heroIv',
@@ -129,7 +129,10 @@ describe('LockedView', () => {
     expect(screen.getByText('MISSION COMMANDER')).toHaveClass('font-label');
     expect(screen.getByText('COMMUNICATION CHANNEL')).toHaveClass('font-label');
 
-    const gibberish = toGibberish(sampleAsset.fields.missionCommander.ciphertext, 24);
+    const gibberish = toGibberish(
+      sampleAsset.fields.missionCommander.ciphertext,
+      sampleAsset.fields.missionCommander.charCount,
+    );
     expect(screen.getByText(gibberish)).toBeInTheDocument();
     expect(screen.queryByText(sampleAsset.fields.missionCommander.ciphertext)).not.toBeInTheDocument();
   });

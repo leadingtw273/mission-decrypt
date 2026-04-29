@@ -43,6 +43,7 @@ export const CryptoParamsSchema = z.object({
 const EncryptedField = z.object({
   iv: Base64Url,
   ciphertext: Base64Url,
+  charCount: z.number().int().nonnegative(),
 });
 
 const WrappedKeyEntry = z.object({

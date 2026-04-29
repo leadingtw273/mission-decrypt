@@ -65,7 +65,7 @@ export async function encryptMission(input: {
 
   // 3) Encrypt each field with M + AAD
   const usedIvs = new Set<string>();
-  const fields: Record<string, { iv: string; ciphertext: string }> = {};
+  const fields: Record<string, { iv: string; ciphertext: string; charCount: number }> = {};
   for (const fieldName of FIELD_NAMES) {
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const ivKey = toBase64Url(iv);
@@ -75,8 +75,9 @@ export async function encryptMission(input: {
       schemaVersion: SCHEMA_VERSION, cryptoVersion: CRYPTO_VERSION,
       missionId, fieldName, params,
     });
-    const ct = await aesGcmEncrypt(M, iv, utf8Encode(mission[fieldName as keyof MissionPlaintext]), aad);
-    fields[fieldName] = { iv: ivKey, ciphertext: toBase64Url(ct) };
+    const plaintext = mission[fieldName as keyof MissionPlaintext];
+    const ct = await aesGcmEncrypt(M, iv, utf8Encode(plaintext), aad);
+    fields[fieldName] = { iv: ivKey, ciphertext: toBase64Url(ct), charCount: plaintext.length };
   }
 
   // 4) Encrypt hero image (track heroIv in same Set as field IVs since they share key M)
